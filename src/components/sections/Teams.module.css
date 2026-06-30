@@ -1,0 +1,510 @@
+/* The three chapters stack vertically, threaded by a faint center seam */
+.chapters {
+  position: relative;
+  margin-top: 8px;
+}
+/* Connecting spine thread linking the chapters */
+.chapters::before {
+  content: '';
+  position: absolute;
+  top: 70px;
+  bottom: 70px;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(
+    180deg,
+    transparent,
+    var(--border-strong) 10%,
+    var(--border-strong) 90%,
+    transparent
+  );
+  opacity: 0.6;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ── A single team chapter ── */
+.chapter {
+  position: relative;
+  padding-block: clamp(48px, 7vw, 88px);
+  isolation: isolate;
+}
+/* hairline divider between chapters */
+.chapter + .chapter::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(900px, 86%);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
+}
+
+/* Oversized translucent chapter numeral for rhythm */
+.ghost {
+  position: absolute;
+  top: clamp(8px, 3.5vw, 32px);
+  right: 3%;
+  z-index: -1;
+  font-family: var(--font-display);
+  font-size: clamp(150px, 24vw, 360px);
+  font-weight: 700;
+  line-height: 0.78;
+  letter-spacing: -0.05em;
+  background: linear-gradient(
+    158deg,
+    color-mix(in srgb, var(--accent) 62%, transparent),
+    color-mix(in srgb, var(--accent) 6%, transparent) 78%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--accent) 16%, transparent);
+  opacity: 0.55;
+  filter: drop-shadow(0 10px 50px var(--accent-glow));
+  pointer-events: none;
+  user-select: none;
+}
+.reversed .ghost {
+  right: auto;
+  left: 4%;
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: 0.92fr 1.08fr;
+  gap: clamp(32px, 5vw, 72px);
+  align-items: center;
+}
+.reversed .inner {
+  grid-template-columns: 1.08fr 0.92fr;
+}
+.reversed .text {
+  order: 2;
+}
+.reversed .visual {
+  order: 1;
+}
+
+/* ── Story text column ── */
+.mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 13px;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  box-shadow: 0 8px 24px -10px var(--accent-glow);
+}
+.codename {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--accent) 88%, #fff);
+  /* Refined marker chip rather than a loose label. */
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, transparent);
+}
+.name {
+  font-size: clamp(26px, 3.6vw, 40px);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  margin-bottom: 18px;
+  text-wrap: balance;
+}
+.story {
+  font-size: clamp(17px, 1.8vw, 20px);
+  line-height: 1.55;
+  color: var(--text);
+  letter-spacing: -0.01em;
+  margin-bottom: 16px;
+  max-width: 46ch;
+}
+.mission {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.62;
+  max-width: 46ch;
+}
+
+/* ── Shared visual panel (glass) — a premium "team chapter" surface ── */
+.visual {
+  position: relative;
+  padding: clamp(22px, 3vw, 34px);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(130% 110% at 100% 0%, color-mix(in srgb, var(--accent) 13%, transparent), transparent 56%)
+      padding-box,
+    radial-gradient(120% 90% at 0% 100%, rgba(0, 0, 0, 0.28), transparent 60%) padding-box,
+    linear-gradient(155deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.014)) padding-box,
+    linear-gradient(
+        135deg,
+        color-mix(in srgb, var(--accent) 52%, transparent),
+        color-mix(in srgb, var(--accent) 14%, transparent) 55%,
+        rgba(255, 255, 255, 0.08)
+      )
+      border-box;
+  border: 1px solid transparent;
+  box-shadow:
+    var(--shadow-card),
+    0 40px 80px -44px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+/* Stronger top accent band — the chapter's signature edge. */
+.visual::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 22px;
+  right: 22px;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 30%, transparent) 60%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+/* ── Typed instrument header — gives each module its own identity ── */
+.vHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.vKind {
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #fff;
+}
+.vMeta {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* BPT reads as a real terminal: traffic-light dots + mono title on a darker rail */
+.vHeadConsole {
+  padding: 11px 14px;
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--border));
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.34), rgba(0, 0, 0, 0.12));
+}
+.vHeadConsole .vKind {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+.vDots {
+  display: inline-flex;
+  gap: 6px;
+}
+.vDots i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--border-strong);
+}
+.vDots i:first-child {
+  background: color-mix(in srgb, var(--accent) 70%, #000);
+}
+.vDots i:nth-child(2) {
+  background: color-mix(in srgb, var(--accent) 40%, var(--border-strong));
+}
+
+/* ── PM: delivery pipeline ── */
+.phaseStep {
+  display: block;
+  margin-bottom: 6px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 0.85;
+}
+.pipeline {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+.phase {
+  flex: 1;
+  position: relative;
+  padding: 20px 16px 20px 22px;
+  border-radius: var(--radius);
+  background:
+    radial-gradient(130% 90% at 0% 0%, color-mix(in srgb, var(--accent) 13%, transparent), transparent 58%),
+    linear-gradient(165deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.014));
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+  transition: transform 0.35s var(--ease-out), border-color 0.35s var(--ease-out),
+    box-shadow 0.35s var(--ease-out);
+}
+.phase:hover {
+  transform: translateY(-5px);
+  border-color: color-mix(in srgb, var(--accent) 46%, transparent);
+  box-shadow: var(--shadow-card), 0 26px 52px -28px var(--accent-glow);
+}
+.phase:hover .phaseDot {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 24%, transparent), 0 0 18px var(--accent-glow);
+}
+.phaseDot {
+  position: absolute;
+  top: 18px;
+  left: -5px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 16%, transparent), 0 0 12px var(--accent-glow);
+  transition: box-shadow 0.35s var(--ease-out);
+}
+.phase h4 {
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  margin-bottom: 6px;
+}
+.phase p {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.phaseArrow {
+  align-self: center;
+  flex-shrink: 0;
+  color: var(--accent);
+  opacity: 0.7;
+}
+
+/* ── PP: process stack ── */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.layer {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px 18px;
+  border-radius: var(--radius);
+  background: linear-gradient(
+    100deg,
+    color-mix(in srgb, var(--accent) calc(16% - var(--i) * 4%), transparent),
+    rgba(255, 255, 255, 0.02)
+  );
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+  margin-left: calc(var(--i) * 18px);
+  box-shadow: -6px 8px 20px -16px rgba(0, 0, 0, 0.9);
+  transition: transform 0.35s var(--ease-out), border-color 0.35s var(--ease-out),
+    box-shadow 0.35s var(--ease-out);
+}
+.layer:hover {
+  transform: translateX(6px);
+  border-color: color-mix(in srgb, var(--accent) 48%, transparent);
+  box-shadow: -6px 10px 28px -16px rgba(0, 0, 0, 0.95), 0 0 26px -10px var(--accent-glow);
+}
+.layer:hover::before {
+  opacity: 1;
+}
+/* Stratum edge — each layer sits on the one below */
+.layer::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 0;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--accent);
+  opacity: calc(0.9 - var(--i) * 0.18);
+  transition: opacity 0.35s var(--ease-out);
+}
+.layerIndex {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  padding-top: 1px;
+}
+.layer h4 {
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  margin-bottom: 4px;
+}
+.layer p {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* ── BPT: quality console ── */
+.console {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  align-items: center;
+}
+.checks {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.checks li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 13px 15px;
+  border-radius: var(--radius);
+  background:
+    radial-gradient(120% 80% at 0% 0%, color-mix(in srgb, var(--accent) 11%, transparent), transparent 60%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.012));
+  border: 1px solid var(--border);
+  transition: transform 0.3s var(--ease-out), border-color 0.3s var(--ease-out);
+}
+.checks li:hover {
+  transform: translateX(5px);
+  border-color: color-mix(in srgb, var(--accent) 42%, transparent);
+}
+.checkMark {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border-radius: 7px;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.checks h4 {
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  margin-bottom: 3px;
+}
+.checks p {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+.gauge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.gaugeRing {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  color: var(--accent);
+  background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--accent) 18%, #111016), #0c0c11);
+  border: 2px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 8%, transparent), 0 14px 36px -14px var(--accent-glow);
+}
+/* Sweeping progress arc — the console feels like it's actively reading */
+.gaugeRing::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: conic-gradient(from -90deg, var(--accent), color-mix(in srgb, var(--accent) 20%, transparent) 75%, transparent 0);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2px));
+  opacity: 0.9;
+}
+.gaugeValue {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+.gaugeLabel {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+/* ── Responsive ── */
+@media (max-width: 860px) {
+  .inner,
+  .reversed .inner {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .reversed .text {
+    order: 1;
+  }
+  .reversed .visual {
+    order: 2;
+  }
+  .pipeline {
+    flex-direction: column;
+  }
+  .phaseDot {
+    top: -5px;
+    left: 18px;
+  }
+  .phaseArrow {
+    transform: rotate(90deg);
+  }
+}
+
+@media (max-width: 520px) {
+  .console {
+    grid-template-columns: 1fr;
+  }
+  .gauge {
+    flex-direction: row;
+    justify-content: flex-start;
+  }
+  .layer {
+    margin-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .phase,
+  .layer,
+  .checks li {
+    transition: none;
+  }
+  .phase:hover,
+  .layer:hover,
+  .checks li:hover {
+    transform: none;
+  }
+}

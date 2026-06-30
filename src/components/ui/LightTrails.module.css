@@ -1,0 +1,38 @@
+.svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.base {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.04);
+  stroke-width: 1;
+}
+
+.trail {
+  fill: none;
+  stroke-linecap: round;
+  /* short bright dash traveling along the full path length */
+  stroke-dasharray: 200 2000;
+  stroke-dashoffset: 2200;
+  animation: trail-flow var(--dur, 8s) linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes trail-flow {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trail {
+    animation: none;
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+    opacity: 0.25;
+  }
+}

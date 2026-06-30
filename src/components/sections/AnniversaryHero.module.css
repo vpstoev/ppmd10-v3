@@ -1,0 +1,371 @@
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  padding-top: var(--nav-h);
+  padding-bottom: 80px;
+  overflow: hidden;
+}
+
+/* Layered burgundy/violet depth that drifts slowly behind everything */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  z-index: 0;
+  background:
+    radial-gradient(38% 48% at 28% 22%, rgba(122, 10, 22, 0.22), transparent 60%),
+    radial-gradient(44% 54% at 78% 30%, rgba(91, 22, 112, 0.18), transparent 60%),
+    var(--gradient-dark-depth);
+  animation: heroDrift 26s ease-in-out infinite alternate;
+}
+
+@keyframes heroDrift {
+  from {
+    transform: translate3d(-1.5%, -1%, 0) scale(1.02);
+  }
+  to {
+    transform: translate3d(1.5%, 1.2%, 0) scale(1.06);
+  }
+}
+
+/* Parallax layers — slightly oversized so edges never show while drifting */
+.gridLayer,
+.trailLayer {
+  position: absolute;
+  inset: -12% -6%;
+  will-change: transform;
+}
+.trailLayer {
+  z-index: 0;
+}
+.trailInner {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 72%);
+  -webkit-mask-image: radial-gradient(circle at 50% 45%, #000 0%, transparent 72%);
+}
+
+/* Living aurora — a slowly rotating colored conic blob, heavily blurred */
+.auroraWrap {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  width: min(86vw, 1040px);
+  aspect-ratio: 1.25;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  pointer-events: none;
+}
+.aurora {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg at 50% 50%,
+    rgba(226, 0, 26, 0.4),
+    rgba(255, 150, 90, 0.28),
+    rgba(122, 10, 22, 0.34),
+    rgba(168, 85, 247, 0.16),
+    rgba(226, 0, 26, 0.4)
+  );
+  filter: blur(72px);
+  opacity: 0.6;
+  animation: auroraSpin 48s linear infinite;
+}
+
+/* Soft edge vignette to keep the trails feeling premium, not busy */
+.vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(120% 90% at 50% 40%, transparent 40%, var(--bg) 92%);
+  pointer-events: none;
+}
+
+.glow {
+  position: absolute;
+  top: 32%;
+  left: 50%;
+  width: 84vw;
+  max-width: 980px;
+  aspect-ratio: 1.6;
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(40% 46% at 50% 50%, rgba(255, 160, 100, 0.24), transparent 70%),
+    radial-gradient(46% 50% at 50% 48%, rgba(226, 0, 26, 0.26), transparent 72%),
+    radial-gradient(62% 64% at 50% 58%, rgba(122, 10, 22, 0.26), transparent 76%),
+    radial-gradient(82% 76% at 50% 64%, rgba(109, 40, 217, 0.12), transparent 80%);
+  filter: blur(52px);
+  pointer-events: none;
+  animation: glowPulse 6.5s ease-in-out infinite;
+}
+
+/* Opacity-only pulse — scaling a 52px-blurred layer re-rasterized the blur
+   every frame. Fading it reads the same and is composited cheaply. */
+@keyframes glowPulse {
+  0%,
+  100% {
+    opacity: 0.82;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero::before,
+  .glow {
+    animation: none;
+    transform: translate(-50%, -50%);
+  }
+  .hero::before {
+    transform: none;
+  }
+}
+
+/* Freeze every hero animation while it's scrolled out of view. */
+.paused,
+.paused *,
+.paused *::before,
+.paused *::after {
+  animation-play-state: paused !important;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 22px;
+}
+
+/* Big "10" anniversary lockup — the numeral is the hero, YEARS a quiet label below */
+.bigWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 1.6vw, 18px);
+  margin: 8px 0 6px;
+}
+
+.bigNumber {
+  position: relative;
+  isolation: isolate;
+  font-family: var(--font-display);
+  font-size: clamp(140px, 27vw, 320px);
+  font-weight: 700;
+  line-height: 0.82;
+  letter-spacing: -0.05em;
+  /* Warm white → soft amber. Readable, premium — no red text on red. */
+  background: linear-gradient(180deg, #ffffff 0%, #fff1e0 46%, #ffcf9c 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 18px 60px rgba(255, 160, 100, 0.24));
+}
+
+/* Soft amber bloom clone sitting behind the numeral */
+.bigNumber::before {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(178deg, #ffd9b0, #ffb27a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: blur(28px);
+  opacity: 0.5;
+  animation: bloomPulse 6s ease-in-out infinite;
+}
+
+/* Subtle animated sheen sweeping across the number */
+.bigNumber::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 40%, rgba(255, 255, 255, 0.85) 50%, transparent 60%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  background-size: 250% 100%;
+  animation: sheen 5s ease-in-out infinite;
+}
+
+@keyframes sheen {
+  0%,
+  60% {
+    background-position: 180% 0;
+  }
+  100% {
+    background-position: -80% 0;
+  }
+}
+
+/* "YEARS" — a clean uppercase label flanked by hairlines. No pill, no red-on-red.
+   Uppercase keeps the Y a normal capital; wide tracking reads as premium. */
+.yearsRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(14px, 2.4vw, 26px);
+}
+.yearsRow::before,
+.yearsRow::after {
+  content: '';
+  width: clamp(40px, 9vw, 96px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 230, 210, 0.5));
+}
+.yearsRow::after {
+  background: linear-gradient(90deg, rgba(255, 230, 210, 0.5), transparent);
+}
+.yearsLabel {
+  font-family: var(--font-display);
+  font-size: clamp(16px, 2.4vw, 30px);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.5em;
+  text-indent: 0.5em;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.est {
+  font-family: var(--font-mono);
+  font-size: clamp(11px, 1.1vw, 13px);
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.title {
+  font-size: clamp(21px, 3.2vw, 33px);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  max-width: 760px;
+}
+
+.message {
+  font-size: clamp(16px, 1.9vw, 20px);
+  color: var(--text-muted);
+  max-width: 600px;
+  line-height: 1.6;
+  letter-spacing: -0.005em;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 8px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.scroll {
+  position: absolute;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  z-index: 2;
+}
+.mouse {
+  width: 24px;
+  height: 38px;
+  border: 1.5px solid color-mix(in srgb, var(--accent) 55%, var(--border-strong));
+  border-radius: 13px;
+  display: flex;
+  justify-content: center;
+  padding-top: 7px;
+  box-shadow: 0 0 18px -4px var(--accent-glow), inset 0 0 12px -6px var(--accent-glow);
+}
+.wheel {
+  width: 3px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--accent-2);
+  box-shadow: 0 0 8px var(--accent-glow);
+  animation: wheel 1.6s ease-in-out infinite;
+}
+@keyframes wheel {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(9px);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .scroll {
+    display: none;
+  }
+  .bigWrap {
+    gap: 12px;
+  }
+  .yearsRow::before,
+  .yearsRow::after {
+    width: clamp(28px, 12vw, 60px);
+  }
+  /* Mobile lightening — drop the two most expensive blurred layers (72px aurora
+     + animated light trails) and stop the grain drift. The static glow + scene
+     background keep the hero feeling premium without the GPU cost. */
+  .auroraWrap,
+  .trailLayer {
+    display: none;
+  }
+  .glow {
+    filter: blur(36px);
+    animation: none;
+  }
+  .hero::before {
+    animation: none;
+  }
+}

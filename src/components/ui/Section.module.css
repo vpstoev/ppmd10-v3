@@ -1,0 +1,16 @@
+.section {
+  position: relative;
+  padding-block: 150px;
+}
+
+@media (max-width: 900px) {
+  .section {
+    padding-block: 100px;
+  }
+}
+
+@media (max-width: 640px) {
+  .section {
+    padding-block: 72px;
+  }
+}

@@ -1,0 +1,125 @@
+/* ============================================================
+   shadcn primitive re-skin → A1 / PPMD tokens.
+
+   Dialog & Command render through a portal (out of the React tree under
+   document.body), so a scoped CSS-Module wrapper can't reach them. These
+   global rules target shadcn's stable data-slot attributes and override the
+   neutral light theme that ships with the components. !important is used
+   deliberately to win over the Tailwind utility classes baked into the
+   primitives without depending on stylesheet order.
+   ============================================================ */
+
+/* ── Dialog shell (hosts the people search) ──────────────── */
+[data-slot='dialog-overlay'] {
+  background: rgba(6, 6, 9, 0.62) !important;
+  backdrop-filter: blur(7px) saturate(120%) !important;
+  -webkit-backdrop-filter: blur(7px) saturate(120%) !important;
+}
+[data-slot='dialog-content'] {
+  background:
+    radial-gradient(120% 130% at 0% 0%, rgba(226, 0, 26, 0.12), transparent 55%),
+    linear-gradient(160deg, var(--bg-elevated), #0c0c11) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow:
+    0 44px 100px -40px rgba(0, 0, 0, 0.92),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  --tw-ring-color: transparent !important;
+}
+
+/* ── Command (cmdk) ──────────────────────────────────────── */
+[data-slot='command'] {
+  background: transparent !important;
+  color: var(--text) !important;
+}
+[data-slot='command-input-wrapper'] {
+  padding: 14px 14px 8px !important;
+}
+[data-slot='command-input-wrapper'] [data-slot='input-group'] {
+  height: 48px !important;
+  background: var(--surface-strong) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: var(--radius) !important;
+}
+[data-slot='command-input'] {
+  color: var(--text) !important;
+  font-family: var(--font-sans) !important;
+  font-size: 15px !important;
+}
+[data-slot='command-input']::placeholder {
+  color: var(--text-faint) !important;
+}
+[data-slot='input-group-addon'] {
+  color: var(--text-faint) !important;
+}
+[data-slot='command-list'] {
+  max-height: 340px !important;
+  padding: 4px 6px 8px !important;
+}
+[data-slot='command-empty'] {
+  color: var(--text-muted) !important;
+  padding: 28px 0 !important;
+}
+[cmdk-group-heading] {
+  color: var(--text-faint) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.14em !important;
+  text-transform: uppercase !important;
+  padding: 12px 8px 6px !important;
+}
+[data-slot='command-item'] {
+  color: var(--text) !important;
+  gap: 11px !important;
+  padding: 8px 10px !important;
+  border-radius: var(--radius-sm) !important;
+  border: 1px solid transparent !important;
+}
+[data-slot='command-item'][data-selected='true'],
+[data-slot='command-item'][aria-selected='true'] {
+  background: var(--accent-soft) !important;
+  border-color: var(--accent-border) !important;
+  color: #fff !important;
+}
+/* The auto-appended check icon isn't meaningful for a people picker */
+[data-slot='command-item'] > svg:last-child {
+  display: none !important;
+}
+
+/* ── Tabs (inline team switcher) ─────────────────────────── */
+[data-slot='tabs-list'] {
+  height: auto !important;
+  padding: 0 !important;
+  background: transparent !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+}
+[data-slot='tabs-trigger'] {
+  flex: none !important;
+  height: auto !important;
+  padding: 9px 18px !important;
+  border-radius: 999px !important;
+  border: 1px solid var(--border-strong) !important;
+  background: var(--surface-strong) !important;
+  color: var(--text-muted) !important;
+  font-family: var(--font-display) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  transition: color var(--dur), background var(--dur), border-color var(--dur),
+    box-shadow var(--dur) !important;
+}
+[data-slot='tabs-trigger']::after {
+  display: none !important;
+}
+[data-slot='tabs-trigger']:hover {
+  color: #fff !important;
+}
+[data-slot='tabs-trigger'][data-active],
+[data-slot='tabs-trigger'][data-state='active'] {
+  background: var(--accent-soft) !important;
+  border-color: var(--accent-border) !important;
+  color: #fff !important;
+  box-shadow: var(--shadow-glow) !important;
+}

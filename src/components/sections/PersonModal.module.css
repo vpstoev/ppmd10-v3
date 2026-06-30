@@ -1,0 +1,267 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(5, 5, 8, 0.7);
+  backdrop-filter: blur(8px);
+}
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: var(--radius-xl);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 40px 120px -30px rgba(0, 0, 0, 0.8);
+}
+
+.banner {
+  position: relative;
+  height: 104px;
+  overflow: hidden;
+  background:
+    radial-gradient(80% 140% at 50% 0%, color-mix(in srgb, var(--accent) 40%, transparent), transparent 70%),
+    linear-gradient(180deg, color-mix(in srgb, var(--accent) 18%, transparent), transparent);
+  border-bottom: 1px solid var(--border);
+}
+/* Decorative orbit rings — the system motif behind the node */
+.bannerOrbit,
+.bannerOrbit2 {
+  position: absolute;
+  left: 40px;
+  bottom: -120px;
+  border-radius: 50%;
+  border: 1px dashed color-mix(in srgb, var(--accent) 40%, transparent);
+  pointer-events: none;
+}
+.bannerOrbit {
+  width: 200px;
+  height: 200px;
+  margin-left: -100px;
+}
+.bannerOrbit2 {
+  width: 300px;
+  height: 300px;
+  margin-left: -150px;
+  border-color: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+/* Avatar as a node with a slowly orbiting ring */
+.avatarNode {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.avatarRing {
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  border: 1px dashed color-mix(in srgb, var(--accent) 45%, transparent);
+  animation: ringSpin 22s linear infinite;
+}
+.avatarRing::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 10px 1px var(--accent-glow);
+}
+@keyframes ringSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .avatarRing {
+    animation: none;
+  }
+}
+
+.close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  color: var(--text);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border-strong);
+  backdrop-filter: blur(6px);
+  transition: background 0.2s;
+}
+.close:hover {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.head {
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+  padding: 0 28px;
+  margin-top: -48px;
+}
+.headText {
+  padding-bottom: 4px;
+}
+.team {
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.name {
+  font-size: 26px;
+  letter-spacing: -0.025em;
+  margin: 4px 0 2px;
+}
+.role {
+  font-size: 15px;
+  color: var(--text-muted);
+}
+.node {
+  display: inline-block;
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.body {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.fieldLabel {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.fieldValue {
+  font-size: 15.5px;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.quote {
+  position: relative;
+  margin: 4px 0 0;
+  padding: 22px 24px;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+}
+.quoteMark {
+  color: var(--accent);
+  opacity: 0.5;
+  margin-bottom: 8px;
+}
+.quote blockquote {
+  margin: 0;
+  font-size: 17px;
+  font-style: italic;
+  line-height: 1.6;
+  color: #fff;
+}
+.quote figcaption {
+  margin-top: 12px;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* "Place in the system" — the three modules, this person's highlighted */
+.connections {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+.connLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.connNodes {
+  display: flex;
+  gap: 8px;
+}
+.connNode {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-faint);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  transition: color 0.2s, border-color 0.2s;
+}
+.connNode::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 40%, var(--text-faint));
+}
+.connActive {
+  color: #fff;
+  border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+.connActive::before {
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+@media (max-width: 520px) {
+  .head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .name {
+    font-size: 22px;
+  }
+}

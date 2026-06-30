@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(rm -f src/App.css src/assets/react.svg src/assets/vite.svg src/assets/hero.png public/icons.svg)",
+      "Bash(ls src/assets)",
+      "Bash(npm run *)",
+      "PowerShell(npm run *)",
+      "Bash(npx tsc *)",
+      "Bash(echo \"---EXIT:$?---\")",
+      "Read(//tmp/**)",
+      "Bash(ping *)",
+      "Bash(rm -f StatsHighlightBand.tsx StatsHighlightBand.module.css DepartmentSystemMap.tsx DepartmentSystemMap.module.css TeamDirectory.tsx TeamDirectory.module.css)",
+      "Read(//c/Users/user/**)",
+      "Bash(npm.cmd install *)",
+      "Bash(npm.cmd run *)",
+      "Bash(npx.cmd shadcn@latest init --yes --base-color neutral)",
+      "Bash(npx.cmd shadcn@latest init --help)",
+      "Bash(npx.cmd shadcn@latest init -t vite -b radix --yes)",
+      "Bash(npx.cmd shadcn@latest init -t vite -b radix -p nova --yes --force)",
+      "Bash(npx.cmd shadcn@latest add dialog tabs command --yes)",
+      "Bash(npx.cmd shadcn@latest add https://21st.dev/r/avanishverma4/bento-grid-01 --yes)",
+      "Bash(node -e \"const p=require\\('./package.json'\\);console.log\\('deps+dev keys with motion:',Object.keys\\({...p.dependencies,...p.devDependencies}\\).filter\\(k=>/motion/.test\\(k\\)\\)\\)\")",
+      "Bash(node --input-type=module -e ' *)",
+      "Bash(node -e ' *)"
+    ]
+  }
+}

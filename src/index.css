@@ -1,0 +1,505 @@
+@import 'tailwindcss';
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================
+   Design tokens & global styles
+   ============================================================ */
+:root {
+  /* Palette — A1-inspired dark identity */
+  --bg: #0a0a0d;
+  --bg-elevated: #111116;
+  --surface: rgba(255, 255, 255, 0.035);
+  --surface-strong: rgba(255, 255, 255, 0.07);
+  --surface-2: rgba(255, 255, 255, 0.05);
+  --border: rgba(255, 255, 255, 0.09);
+  --border-strong: rgba(255, 255, 255, 0.16);
+
+  --text: #edecf2;
+  --text-muted: #a6a6b2;
+  /* Lifted from #6c6c77 so small uppercase labels clear AA on the dark base */
+  --text-faint: #8a8a96;
+
+  /* A1 red as the primary accent */
+  --accent: #e2001a;
+  --accent-2: #ff3b3b;
+  --accent-3: #ff6a5e;
+  --accent-soft: rgba(226, 0, 26, 0.14);
+  --accent-glow: rgba(226, 0, 26, 0.42);
+  --accent-border: rgba(226, 0, 26, 0.4);
+
+  /* Amber — reserved EXCLUSIVELY for anniversary hallmarks (the "10",
+     timeline 2015/2025, the closing). Scarcity is what makes it special. */
+  --amber: #ffb27a;
+  --amber-2: #ffd9b0;
+  --amber-glow: rgba(255, 150, 90, 0.45);
+
+  /* Per-team accents — one department, three WARM identities (red / magenta / coral).
+     Violet & teal are deliberately kept out of here so the spine stays warm;
+     they appear only inside the Universe scene's cool atmosphere. */
+  --team-pm: #ff3340; /* A1 red */
+  --team-pm-glow: rgba(255, 51, 64, 0.4);
+  --team-pp: #d6248f; /* warm magenta */
+  --team-pp-glow: rgba(214, 36, 143, 0.4);
+  --team-bpt: #ff7a45; /* warm coral */
+  --team-bpt-glow: rgba(255, 122, 69, 0.4);
+
+  /* ── A1 gradient system ──────────────────────────────────
+     Centralized, reusable gradients. Red is the anchor; burgundy
+     adds depth, violet/magenta add richness, cyan is used sparingly. */
+  --gradient-brand: linear-gradient(135deg, #ff3340 0%, #e2001a 52%, #9e0710 100%);
+  --gradient-brand-strong: linear-gradient(135deg, #ff4b54 0%, #e2001a 46%, #8a0512 100%);
+  /* Warm spine highlight — used for section highlights across the emotional scenes */
+  --gradient-text: linear-gradient(120deg, #fff5f2 0%, #ffd9c2 42%, #ff8a7a 72%, #e2001a 100%);
+  /* Red-anchored variant — stays on A1 brand */
+  --gradient-text-red: linear-gradient(118deg, #ffffff 0%, #ffd0c8 40%, #ff6a5e 70%, #e2001a 100%);
+  /* Anniversary hallmark — amber → A1 red. Reserved for the "10", 2015/2025, closing. */
+  --gradient-hallmark: linear-gradient(118deg, #fff5f2 0%, #ffd9b0 36%, #ff8a5e 64%, #e2001a 100%);
+
+  --gradient-a1-primary: linear-gradient(135deg, #ff3340 0%, #e2001a 42%, #7a0a16 76%, #5b1670 100%);
+  --gradient-a1-soft: linear-gradient(135deg, rgba(226, 0, 26, 0.22), rgba(109, 40, 217, 0.16));
+  --gradient-red-burgundy: linear-gradient(135deg, #ff3340 0%, #b00014 52%, #6d0712 100%);
+  --gradient-red-violet: linear-gradient(135deg, #e2001a 0%, #8a124e 55%, #6d28d9 100%);
+  --gradient-graphite-burgundy: linear-gradient(145deg, #16161d 0%, #221019 55%, #3a0c16 100%);
+  --gradient-purple-black: linear-gradient(160deg, #1a0b22 0%, #0c0710 60%, #07070a 100%);
+  --gradient-violet-magenta: linear-gradient(135deg, #a855f7 0%, #d6248f 60%, #e2001a 100%);
+
+  --gradient-dark-depth:
+    radial-gradient(circle at 16% 0%, rgba(226, 0, 26, 0.16), transparent 38%),
+    radial-gradient(circle at 90% 6%, rgba(109, 40, 217, 0.12), transparent 42%),
+    linear-gradient(150deg, #08080b 0%, #111016 55%, #1a0710 100%);
+  --gradient-red-glow: radial-gradient(circle, rgba(226, 0, 26, 0.4), transparent 70%);
+
+  --gradient-card: linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+  --gradient-card-hover: linear-gradient(145deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03));
+  --gradient-border: linear-gradient(
+    135deg,
+    rgba(226, 0, 26, 0.45),
+    rgba(109, 40, 217, 0.25),
+    rgba(255, 255, 255, 0.08)
+  );
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 12px 30px -12px rgba(0, 0, 0, 0.7);
+  --shadow-glow: 0 0 0 1px rgba(226, 0, 26, 0.2), 0 18px 60px -20px rgba(226, 0, 26, 0.5);
+  --shadow-glow-strong: 0 0 0 1px rgba(226, 0, 26, 0.32), 0 22px 70px -18px rgba(226, 0, 26, 0.62);
+  --shadow-card: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 16px 38px -26px rgba(0, 0, 0, 0.8);
+
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 26px;
+
+  /* 8pt spacing scale — one rhythm across components, sections and pages */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 120px;
+
+  /* Card & spacing system */
+  --card-pad: 28px;
+  --card-pad-sm: 22px;
+
+  --container: 1180px;
+  --nav-h: 72px;
+
+  /* Typography — Sora for display/labels, Inter for body */
+  --font-display: 'Sora', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', Consolas, monospace;
+
+  /* Reusable label style (eyebrows, tags, nav, buttons) */
+  --label-tracking: 0.02em;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 0.18s;
+  --dur: 0.28s;
+
+  color-scheme: dark;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.65;
+  letter-spacing: -0.011em;
+  font-feature-settings: 'liga' 1, 'calt' 1;
+  overflow-x: hidden;
+}
+
+@media (max-width: 640px) {
+  body {
+    font-size: 16px;
+  }
+}
+
+/* Ambient page background: aurora glow + grid */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  /* Warm anniversary spine ambient — red, amber and burgundy (no cool violet) */
+  background:
+    radial-gradient(60% 50% at 50% -10%, rgba(226, 0, 26, 0.2), transparent 70%),
+    radial-gradient(45% 45% at 88% 6%, rgba(255, 140, 90, 0.09), transparent 70%),
+    radial-gradient(50% 48% at 6% 24%, rgba(122, 10, 22, 0.16), transparent 70%);
+  pointer-events: none;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(circle at 50% 0%, #000 0%, transparent 75%);
+  -webkit-mask-image: radial-gradient(circle at 50% 0%, #000 0%, transparent 75%);
+  pointer-events: none;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  color: #fff;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* Consistent keyboard focus across the site */
+:focus-visible {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--accent-glow);
+  color: #fff;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  border: 2px solid var(--bg);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Shared helpers */
+.gradient-text {
+  background: var(--gradient-text);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ── Shared button system ──────────────────────────────────
+   One interaction language for every CTA across the site. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 46px;
+  padding: 13px 24px;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  border: 1px solid transparent;
+  transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur),
+    background var(--dur), border-color var(--dur), color var(--dur);
+}
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  color: #fff;
+  background: var(--gradient-brand-strong);
+  box-shadow: var(--shadow-glow);
+}
+.btn-primary:hover {
+  box-shadow: var(--shadow-glow-strong);
+  transform: translateY(-2px);
+}
+
+.btn-ghost {
+  color: var(--text);
+  background: var(--surface-strong);
+  border-color: var(--border-strong);
+  backdrop-filter: blur(8px);
+}
+.btn-ghost:hover {
+  color: #fff;
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+  transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn:hover {
+    transform: none;
+  }
+}
+
+/* ── Department OS primitives ──────────────────────────────
+   Shared glass surface + monospace "system" label used across
+   the universe, modules and flow sections. */
+.glass {
+  background:
+    linear-gradient(150deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.02)) padding-box,
+    var(--gradient-border) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px) saturate(120%);
+  -webkit-backdrop-filter: blur(12px) saturate(120%);
+}
+/* Backdrop blur re-rasterizes the moving background every scroll frame; on
+   small screens the cost isn't worth it. Fall back to a slightly more opaque
+   surface so the glass still reads. */
+@media (max-width: 768px) {
+  .glass {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: linear-gradient(150deg, rgba(28, 28, 36, 0.82), rgba(18, 18, 24, 0.7));
+  }
+}
+
+.sys-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+/* ── Premium motion primitives (CSS) ───────────────────────
+   The global reduced-motion rule below disables all of these. */
+@keyframes auroraSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes auroraDrift {
+  0%,
+  100% {
+    transform: translate3d(-2%, -1%, 0) scale(1.02);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translate3d(2%, 1.5%, 0) scale(1.08);
+    opacity: 0.7;
+  }
+}
+@keyframes bloomPulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.06);
+  }
+}
+@keyframes haloSpin {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: 'Geist Variable', sans-serif;
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
