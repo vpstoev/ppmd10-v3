@@ -42,10 +42,9 @@ export function RequestToImpactFlow() {
               style={{ '--accent': `var(${teamAccent(step.lead)})` } as CSSProperties}
               variants={staggerItem}
             >
-              <div className={styles.rail}>
-                <span className={styles.num}>{String(i + 1).padStart(2, '0')}</span>
-                {i < processSteps.length - 1 && <span className={styles.connector} aria-hidden />}
-              </div>
+              <span className={styles.num} aria-hidden>
+                {String(i + 1).padStart(2, '0')}
+              </span>
 
               <div className={styles.card}>
                 <div className={styles.cardHead}>

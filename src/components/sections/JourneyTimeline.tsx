@@ -43,8 +43,8 @@ export function JourneyTimeline() {
             <motion.div
               key={m.year}
               className={`${styles.stop} ${m.major ? styles.major : ''}`}
-              initial={reduce ? { opacity: 0 } : { opacity: 0, x: -24, filter: 'blur(6px)' }}
-              whileInView={reduce ? { opacity: 1 } : { opacity: 1, x: 0, filter: 'blur(0px)' }}
+              initial={reduce ? { opacity: 0 } : { opacity: 0, x: -24 }}
+              whileInView={reduce ? { opacity: 1 } : { opacity: 1, x: 0 }}
               viewport={viewportOnce}
               transition={{ duration: 0.6, ease: easeOut }}
             >

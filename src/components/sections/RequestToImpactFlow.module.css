@@ -2,57 +2,64 @@
   list-style: none;
   margin: 0 auto;
   padding: 0;
-  max-width: 760px;
-}
-
-/* Each stage = a numbered rail node + a readable card */
-.step {
-  display: grid;
-  grid-template-columns: 64px 1fr;
-  gap: 22px;
-}
-
-.rail {
-  position: relative;
+  max-width: 880px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-}
-.num {
-  display: grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: #fff;
-  background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--accent) 30%, #18121a), #100b12);
-  border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
-  box-shadow: 0 0 26px -10px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-}
-/* Connector line between stages */
-.connector {
-  flex: 1;
-  width: 2px;
-  min-height: 28px;
-  margin: 6px 0;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 60%, transparent), var(--border-strong));
-  border-radius: 2px;
+  gap: clamp(16px, 2vw, 24px);
 }
 
-/* Content card — lifted glass for contrast */
+/* Each stage = a large editorial numeral beside a readable card. No connector
+   spine, no circular badge — it reads as a sequence, not a flowchart. */
+.step {
+  display: grid;
+  grid-template-columns: clamp(58px, 7vw, 104px) 1fr;
+  align-items: stretch;
+  gap: clamp(16px, 2.4vw, 32px);
+}
+.num {
+  align-self: center;
+  font-family: var(--font-display);
+  font-size: clamp(40px, 5.5vw, 80px);
+  font-weight: 700;
+  line-height: 0.85;
+  letter-spacing: -0.05em;
+  text-align: right;
+  color: transparent;
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--accent) 78%, #fff),
+    color-mix(in srgb, var(--accent) 24%, transparent)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Content card — lifted glass for contrast, with an accent edge. */
 .card {
-  margin-bottom: 18px;
-  padding: 22px 24px;
+  position: relative;
+  padding: clamp(22px, 2.4vw, 30px) clamp(24px, 2.6vw, 34px);
   border-radius: var(--radius-lg);
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.022));
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.02));
   border: 1px solid var(--border-strong);
-  box-shadow: 0 22px 50px -36px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  box-shadow: 0 24px 54px -38px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.07);
   backdrop-filter: blur(12px);
+  transition: transform 0.35s var(--ease-out), border-color 0.35s var(--ease-out);
+}
+/* Accent edge on the left — the stage's lead team color. */
+.card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: clamp(18px, 2vw, 26px);
+  bottom: clamp(18px, 2vw, 26px);
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--accent);
+  box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 50%, transparent);
+}
+.card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--border-strong));
 }
 .cardHead {
   display: flex;
@@ -147,15 +154,23 @@
 
 @media (max-width: 560px) {
   .step {
-    grid-template-columns: 48px 1fr;
-    gap: 16px;
+    grid-template-columns: 1fr;
+    gap: 4px;
   }
   .num {
-    width: 44px;
-    height: 44px;
-    font-size: 16px;
+    text-align: left;
+    font-size: 44px;
   }
   .value {
     min-width: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+  .card:hover {
+    transform: none;
   }
 }
