@@ -32,7 +32,10 @@
   background: var(--p-graphite);
   color: var(--p-ink);
   font-family: var(--font-sans, system-ui, sans-serif);
-  overflow-x: hidden;
+  /* MUST be `clip`, never `hidden`: overflow-x hidden turns this
+     div into a scroll container, which silently breaks
+     position: sticky for the pinned hero scene. */
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -46,7 +49,7 @@
     radial-gradient(80% 60% at 16% -8%, rgba(96, 18, 34, 0.85), transparent 60%),
     radial-gradient(55% 45% at 88% 0%, rgba(226, 0, 26, 0.18), transparent 55%),
     radial-gradient(60% 55% at 85% 110%, rgba(255, 150, 90, 0.08), transparent 60%),
-    radial-gradient(120% 100% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.5) 100%),
+    radial-gradient(120% 100% at 50% 50%, transparent 58%, rgba(0, 0, 0, 0.32) 100%),
     linear-gradient(180deg, #08070b 0%, #0c0a11 45%, #09080c 100%);
 }
 .grain {
@@ -286,7 +289,7 @@
   gap: 1rem;
   padding-top: 0.9rem;
   border-top: 1px solid var(--p-line);
-  color: var(--p-ink-faint);
+  color: var(--p-ink-soft);
   font-size: 0.72rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -404,7 +407,7 @@
 /* Supporting sentence — revealed by the first scroll */
 .heroReveal {
   margin: clamp(0.9rem, 2.4vh, 1.6rem) 0 0;
-  max-width: 62ch;
+  max-width: min(64ch, 680px);
   font-size: clamp(0.95rem, 1.25vw, 1.15rem);
   line-height: 1.7;
   color: var(--p-ink-soft);
@@ -426,7 +429,7 @@
   gap: 2rem;
   padding-top: clamp(1rem, 2.4vh, 1.5rem);
   border-top: 1px solid var(--p-line);
-  color: var(--p-ink-faint);
+  color: var(--p-ink-soft);
   font-size: 0.78rem;
   will-change: transform, opacity;
 }

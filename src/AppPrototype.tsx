@@ -311,12 +311,13 @@ function Hero() {
   const backOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.1])
   // The lockup opens STRONG (0.96 — already impressive), energizes
   // past full size (1.07) while the supporting line reveals, then
-  // recedes upward as the panel enters.
-  const midScale = useTransform(scrollYProgress, [0, 0.35, 0.7, 1], [0.96, 1.07, 1, 0.93])
-  const midY = useTransform(scrollYProgress, [0, 0.35, 0.7, 1], [12, 0, -20, -90])
-  const midOpacity = useTransform(scrollYProgress, [0, 0.7, 1], [1, 1, 0.25])
-  const revealOpacity = useTransform(scrollYProgress, [0, 0.12, 0.3, 0.72, 1], [0, 0, 1, 1, 0])
-  const revealY = useTransform(scrollYProgress, [0.12, 0.3], [24, 0])
+  // recedes upward as the panel enters. Opacity stays at 1 until
+  // the final exit phase (never dimmed while readable).
+  const midScale = useTransform(scrollYProgress, [0, 0.34, 0.72, 1], [0.96, 1.07, 1, 0.93])
+  const midY = useTransform(scrollYProgress, [0, 0.34, 0.72, 1], [12, 0, -18, -80])
+  const midOpacity = useTransform(scrollYProgress, [0, 0.78, 1], [1, 1, 0.22])
+  const revealOpacity = useTransform(scrollYProgress, [0, 0.14, 0.3, 0.74, 1], [0, 0, 1, 1, 0])
+  const revealY = useTransform(scrollYProgress, [0, 0.3, 0.78, 1], [26, 0, 0, -30])
   const frontY = useTransform(scrollYProgress, [0, 0.55], [0, 170])
   const frontOpacity = useTransform(scrollYProgress, [0.06, 0.45], [1, 0])
   const barsOpacity = useTransform(scrollYProgress, [0, 0.22], [1, 0])
