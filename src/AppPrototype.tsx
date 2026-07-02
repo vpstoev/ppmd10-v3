@@ -1,5 +1,5 @@
 /* ============================================================
-   AppPrototype — cinematic chapter redesign (v7)
+   AppPrototype — cinematic chapter redesign (v9, correction pass)
 
    A SEPARATE, visually dramatic prototype of the PPMD 10-year
    anniversary homepage. It does NOT replace the production App.
@@ -9,13 +9,17 @@
    so no data files are touched.
 
    The page is built as CHAPTERS, not stacked cards:
-   · Hero — pinned 200vh scene; the number pushes through the
-     screen while the first chapter panel slides up OVER it.
+   · Hero — pinned 200vh opening scene with three depth layers;
+     the 10 YEARS lockup + department band punch in then recede
+     while the first chapter panel slides up OVER the scene.
    · Foundation — compact active-feature pillar stage with tabs.
    · Teams & People — overview strip + team cards → dedicated
-     team chapter (intro → leadership → carousel → tiles → roster).
-   · Journey — center-snapped milestone rail with arrows.
-   · Voices — editorial quotes + closing mark.
+     team chapter (identity → unified people composition with
+     integrated leadership → capability tiles).
+   · In Motion — ONE shared hot-topics carousel for all teams.
+   · Journey — vertical scroll timeline with a self-drawing spine
+     and a sticky watermark year.
+   · Voices — editorial quotes + closing mark + credit.
 
    All motion is transform/opacity only and reduced-motion safe.
    ============================================================ */
@@ -24,6 +28,7 @@ import { type ReactNode, useEffect, useRef, useState } from 'react'
 import {
   AnimatePresence,
   motion,
+  useMotionValueEvent,
   useReducedMotion,
   useScroll,
   useTransform,
@@ -195,78 +200,65 @@ function isLeader(p: Person) {
   return false
 }
 
-/* ── Local placeholder copy (NOT from data files) ──────────────
-   Illustrative "current activities" and capability facts per team
-   so the dedicated chapter has a carousel + tiles. Swap freely. */
+/* ── Prototype accent palette (visual identity only) ────────────
+   Overrides the data-file accents WITHOUT touching src/data:
+   · PM keeps the signature red,
+   · Process & Procedures gets a coral-rose nuance,
+   · BPT & Testing gets a steel-blue accent,
+   · the Department Head has a unique gold identity. */
 
-const teamActivities: Record<TeamId, { tag: string; title: string; detail: string }[]> = {
-  pm: [
-    {
-      tag: 'In progress',
-      title: 'Company-wide delivery portfolio',
-      detail: 'Coordinating a portfolio of cross-functional initiatives from kickoff to launch.',
-    },
-    {
-      tag: 'Scaling',
-      title: 'Delivery framework, next iteration',
-      detail: 'Refining the planning, risk and governance model the department runs on.',
-    },
-    {
-      tag: 'Ongoing',
-      title: 'Stakeholder alignment forums',
-      detail: 'Keeping business and delivery aligned across every active project.',
-    },
-    {
-      tag: 'Kicking off',
-      title: 'Portfolio reporting upgrade',
-      detail: 'One live view of every initiative — status, risk and value in a single place.',
-    },
-  ],
-  pp: [
-    {
-      tag: 'In progress',
-      title: 'Process documentation refresh',
-      detail: 'Bringing core company processes into one clear, trusted, shared library.',
-    },
-    {
-      tag: 'Rollout',
-      title: 'Procedure governance model',
-      detail: 'Standardizing how procedures are approved, versioned and maintained.',
-    },
-    {
-      tag: 'Ongoing',
-      title: 'Continuous improvement cycles',
-      detail: 'Every review makes a key workflow a little simpler than before.',
-    },
-    {
-      tag: 'Kicking off',
-      title: 'Knowledge management platform',
-      detail: 'Making the right process knowledge findable by anyone, in seconds.',
-    },
-  ],
-  bpt: [
-    {
-      tag: 'In progress',
-      title: 'Business process transformation',
-      detail: 'Reshaping and simplifying core operational flows across the company.',
-    },
-    {
-      tag: 'Scaling',
-      title: 'Test automation suite',
-      detail: 'Expanding automated coverage that runs before every major release.',
-    },
-    {
-      tag: 'Ongoing',
-      title: 'Release quality gates',
-      detail: 'The last check before a change reaches a customer is ours to make.',
-    },
-    {
-      tag: 'Kicking off',
-      title: 'End-to-end regression program',
-      detail: 'A single regression pack protecting the customer journeys that matter most.',
-    },
-  ],
+const teamAccent: Record<TeamId, string> = {
+  pm: '#ff3340',
+  pp: '#f2788f',
+  bpt: '#5b9ee0',
 }
+const headAccent = '#e3a455'
+
+/* ── Local placeholder copy (NOT from data files) ──────────────
+   Department-wide hot topics for the shared carousel and
+   capability facts per team. Swap freely — the list length of
+   `hotTopics` can vary. */
+
+type HotTopic = { tag: string; team: string; title: string; detail: string }
+
+const hotTopics: HotTopic[] = [
+  {
+    tag: 'In progress',
+    team: 'Project Management',
+    title: 'Company-wide delivery portfolio',
+    detail: 'A portfolio of cross-functional initiatives coordinated from kickoff to launch.',
+  },
+  {
+    tag: 'Rollout',
+    team: 'Process & Procedures',
+    title: 'Process documentation refresh',
+    detail: 'Core company processes brought into one clear, trusted, shared library.',
+  },
+  {
+    tag: 'Scaling',
+    team: 'BPT & Testing',
+    title: 'Test automation suite',
+    detail: 'Automated coverage expanding before every major release.',
+  },
+  {
+    tag: 'Kicking off',
+    team: 'Project Management',
+    title: 'Portfolio reporting upgrade',
+    detail: 'One live view of every initiative — status, risk and value in a single place.',
+  },
+  {
+    tag: 'Ongoing',
+    team: 'Process & Procedures',
+    title: 'Knowledge management platform',
+    detail: 'The right process knowledge findable by anyone, in seconds.',
+  },
+  {
+    tag: 'In progress',
+    team: 'BPT & Testing',
+    title: 'Business process transformation',
+    detail: 'Core operational flows reshaped and simplified across the company.',
+  },
+]
 
 const teamFacts: Record<TeamId, { value: string; label: string }[]> = {
   pm: [
@@ -299,7 +291,7 @@ function Atmosphere() {
   )
 }
 
-/* ── 1. Hero — pinned push-through scene ───────────────────── */
+/* ── 1. Hero — anniversary opening scene ───────────────────── */
 function Hero() {
   const reduce = useReducedMotion()
   const heroRef = useRef<HTMLElement>(null)
@@ -308,18 +300,25 @@ function Hero() {
     offset: ['start start', 'end end'],
   })
 
-  // Two-phase push-through: the lockup breathes IN toward the
-  // viewer first (scale up), then recedes upward while the copy
-  // sinks with its own depth — and the chapter panel sweeps over.
-  const lockupScale = useTransform(scrollYProgress, [0, 0.3, 1], [1, 1.12, 0.82])
-  const lockupY = useTransform(scrollYProgress, [0, 0.3, 1], [0, -12, -180])
-  const lockupOpacity = useTransform(scrollYProgress, [0, 0.5, 0.92], [1, 1, 0])
-  const copyY = useTransform(scrollYProgress, [0, 0.65], [0, 150])
-  const copyScale = useTransform(scrollYProgress, [0, 0.65], [1, 0.94])
-  const copyOpacity = useTransform(scrollYProgress, [0.08, 0.5], [1, 0])
+  // Three depth layers, three scroll speeds:
+  // · background — outlined wordmark drifts and grows slowest,
+  // · midground  — the 10 YEARS lockup + department band punch
+  //   toward the viewer first (scale up), then recede upward,
+  // · foreground — the headline strip sinks fastest,
+  // while the chapter panel sweeps over the whole scene.
+  const backScale = useTransform(scrollYProgress, [0, 1], [1, 1.22])
+  const backY = useTransform(scrollYProgress, [0, 1], [0, -70])
+  const backOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.1])
+  // The lockup STARTS slightly compact, grows past full size on the
+  // first scroll (while the supporting line reveals), then recedes.
+  const midScale = useTransform(scrollYProgress, [0, 0.3, 1], [0.92, 1.06, 0.66])
+  const midY = useTransform(scrollYProgress, [0, 0.3, 1], [0, -6, -230])
+  const midOpacity = useTransform(scrollYProgress, [0, 0.55, 0.92], [1, 1, 0])
+  const revealOpacity = useTransform(scrollYProgress, [0.06, 0.24], [0, 1])
+  const revealY = useTransform(scrollYProgress, [0.06, 0.24], [36, 0])
+  const frontY = useTransform(scrollYProgress, [0, 0.55], [0, 170])
+  const frontOpacity = useTransform(scrollYProgress, [0.06, 0.45], [1, 0])
   const barsOpacity = useTransform(scrollYProgress, [0, 0.22], [1, 0])
-  const ghostScale = useTransform(scrollYProgress, [0, 1], [1, 1.3])
-  const ghostOpacity = useTransform(scrollYProgress, [0, 1], [1, 0.2])
 
   const enter: Variants = {
     hidden: { opacity: 0, y: reduce ? 0 : 34 },
@@ -337,16 +336,24 @@ function Hero() {
   return (
     <section ref={heroRef} className={styles.hero} aria-label="10 years of PPMD">
       <div className={styles.heroSticky}>
-        {/* Giant outlined wordmark — deepest parallax layer */}
+        {/* Background layer: architectural grid + edge markers +
+            giant outlined wordmark */}
+        <div className={styles.heroArch} aria-hidden="true" />
+        <span className={styles.heroEdge} aria-hidden="true">
+          Est. 2015
+        </span>
+        <span className={`${styles.heroEdge} ${styles.heroEdgeRight}`} aria-hidden="true">
+          Anniversary · 2025
+        </span>
         <div className={styles.heroGhostWrap} aria-hidden="true">
           <motion.span
             className={styles.heroGhost}
-            style={reduce ? undefined : { scale: ghostScale, opacity: ghostOpacity }}
+            style={reduce ? undefined : { scale: backScale, y: backY, opacity: backOpacity }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1.4, ease, delay: 0.15 }}
           >
-            PPMD
+            {department.short}
           </motion.span>
         </div>
 
@@ -368,47 +375,60 @@ function Hero() {
             <span>Anniversary Edition · 2015 — 2025</span>
           </motion.div>
 
-          <div className={styles.heroStage}>
+          {/* Midground layer: the anniversary statement */}
+          <motion.div
+            className={styles.heroMid}
+            style={reduce ? undefined : { scale: midScale, y: midY, opacity: midOpacity }}
+          >
             <span className={styles.heroGlowBig} aria-hidden="true" />
-            <motion.div
-              className={styles.heroLockup}
-              variants={numberIn}
-              style={reduce ? undefined : { scale: lockupScale, y: lockupY, opacity: lockupOpacity }}
-            >
+            <motion.div className={styles.heroLockup} variants={numberIn}>
               <span className={styles.heroNumber} aria-hidden="true">
                 10
               </span>
               <span className={styles.heroYears}>
                 <span className={styles.heroYearsWord}>Years</span>
-                <span className={styles.heroYearsSub}>of {department.short}</span>
                 <span className={styles.heroYearsRange}>2015 — 2025</span>
               </span>
             </motion.div>
 
-            <motion.div
-              className={styles.heroCopy}
-              style={reduce ? undefined : { y: copyY, scale: copyScale, opacity: copyOpacity }}
-            >
-              <motion.h1 className={styles.heroHeadline} variants={enter}>
-                A decade of delivery, structure and quality —{' '}
-                <em>and the people behind all of it.</em>
-              </motion.h1>
-              <motion.p className={styles.heroIntro} variants={enter}>
-                {department.intro}
-              </motion.p>
+            <motion.div className={styles.heroDeptBand} variants={enter}>
+              <span className={styles.heroDeptShort}>{department.short}</span>
+              <span className={styles.heroDeptName}>{department.name}</span>
+              <span className={styles.heroDeptCo}>{department.company} Bulgaria</span>
             </motion.div>
-          </div>
 
+            {/* Supporting line — revealed by the first scroll */}
+            <motion.p
+              className={styles.heroReveal}
+              style={reduce ? undefined : { opacity: revealOpacity, y: revealY }}
+            >
+              For a whole decade we have helped {department.company} stay a market leader —
+              growing our people, adapting to every change, and keeping the customer at the
+              centre of everything we deliver.{' '}
+              <em>In the biggest challenges, we are the department the company counts on.</em>
+            </motion.p>
+          </motion.div>
+
+          {/* Foreground layer: headline strip + scroll cue */}
           <motion.div
             className={styles.heroBottom}
             variants={enter}
-            style={reduce ? undefined : { opacity: barsOpacity }}
+            style={reduce ? undefined : { y: frontY, opacity: frontOpacity }}
           >
-            <span className={styles.heroScroll}>
-              <span className={styles.heroScrollLine} aria-hidden="true" />
-              Scroll to begin
-            </span>
-            <span className={styles.heroNext}>Next — 01 Foundation</span>
+            <div className={styles.heroCopy}>
+              <h1 className={styles.heroHeadline}>
+                A decade of delivery, structure and quality —{' '}
+                <em>and the people behind all of it.</em>
+              </h1>
+              <p className={styles.heroIntro}>{department.intro}</p>
+            </div>
+            <div className={styles.heroCue}>
+              <span className={styles.heroScroll}>
+                <span className={styles.heroScrollLine} aria-hidden="true" />
+                Scroll to begin
+              </span>
+              <span className={styles.heroNext}>Next — 01 Foundation</span>
+            </div>
           </motion.div>
         </motion.div>
       </div>
@@ -528,7 +548,7 @@ function PersonCard({
     <motion.button
       type="button"
       className={`${styles.personCard} ${lead ? styles.personCardLead : ''}`}
-      style={{ ['--accent' as string]: team.accentHex }}
+      style={{ ['--accent' as string]: teamAccent[team.id] }}
       variants={variants}
       onClick={onOpen}
       whileHover={reduce ? undefined : { y: -5 }}
@@ -629,10 +649,10 @@ function PersonModal({ state, onClose }: { state: ModalState; onClose: () => voi
   )
 }
 
-/** Premium activity carousel — one featured activity at a time. */
-function ActivityCarousel({ team }: { team: Team }) {
+/** Premium hot-topics carousel — one featured item at a time.
+ *  Shared across the department; `items` can be any length. */
+function HotTopicsCarousel({ items }: { items: HotTopic[] }) {
   const reduce = useReducedMotion()
-  const items = teamActivities[team.id]
   const [i, setI] = useState(0)
   const [dir, setDir] = useState(1)
   const a = items[i]
@@ -659,7 +679,7 @@ function ActivityCarousel({ team }: { team: Team }) {
   return (
     <div className={styles.carousel}>
       <div className={styles.carouselHead}>
-        <span className={styles.carouselKicker}>Current top activities</span>
+        <span className={styles.carouselKicker}>Hot topics · all teams</span>
         <div className={styles.carouselNav}>
           <span className={styles.carouselCounter}>
             {String(i + 1).padStart(2, '0')} / {String(items.length).padStart(2, '0')}
@@ -668,7 +688,7 @@ function ActivityCarousel({ team }: { team: Team }) {
             type="button"
             className={styles.iconBtn}
             onClick={() => go(-1)}
-            aria-label="Previous activity"
+            aria-label="Previous topic"
           >
             ←
           </button>
@@ -676,7 +696,7 @@ function ActivityCarousel({ team }: { team: Team }) {
             type="button"
             className={styles.iconBtn}
             onClick={() => go(1)}
-            aria-label="Next activity"
+            aria-label="Next topic"
           >
             →
           </button>
@@ -697,7 +717,10 @@ function ActivityCarousel({ team }: { team: Team }) {
             animate="center"
             exit="exit"
           >
-            <span className={styles.carouselTag}>{a.tag}</span>
+            <div className={styles.carouselMeta}>
+              <span className={styles.carouselTag}>{a.tag}</span>
+              <span className={styles.carouselTeam}>{a.team}</span>
+            </div>
             <h4 className={styles.carouselTitle}>{a.title}</h4>
             <p className={styles.carouselDetail}>{a.detail}</p>
           </motion.article>
@@ -709,7 +732,7 @@ function ActivityCarousel({ team }: { team: Team }) {
           <button
             key={d}
             type="button"
-            aria-label={`Activity ${d + 1}`}
+            aria-label={`Topic ${d + 1}`}
             className={`${styles.carouselDot} ${d === i ? styles.carouselDotActive : ''}`}
             onClick={() => jump(d)}
           />
@@ -734,9 +757,8 @@ function TeamChapter({
   const members = roster.filter((pp) => !isLeader(pp))
 
   const tiles = [
-    { value: String(roster.length), label: 'People', filled: true },
     ...teamFacts[team.id].map((f) => ({ ...f, filled: false })),
-    { value: '10 yrs', label: 'With the department', filled: false },
+    { value: '10 years', label: 'With the department', filled: true },
   ]
 
   const listVariants: Variants = {
@@ -749,12 +771,12 @@ function TeamChapter({
   }
 
   const openPerson = (person: Person) =>
-    onPerson({ person, accent: team.accentHex, label: `Part of ${team.name}` })
+    onPerson({ person, accent: teamAccent[team.id], label: `Part of ${team.name}` })
 
   return (
     <motion.div
       className={styles.teamChapter}
-      style={{ ['--accent' as string]: team.accentHex }}
+      style={{ ['--accent' as string]: teamAccent[team.id] }}
       variants={listVariants}
       initial="hidden"
       animate="visible"
@@ -768,7 +790,7 @@ function TeamChapter({
         ← All teams
       </motion.button>
 
-      {/* Editorial team identity — open composition, no box */}
+      {/* A. Team identity — name, intro, people count, focus areas */}
       <motion.header className={styles.tHead} variants={cardVariants}>
         <span className={styles.tGhost} aria-hidden="true">
           {team.codename.split('.')[0]}
@@ -777,14 +799,27 @@ function TeamChapter({
         <h3 className={styles.tName}>{team.name}</h3>
         <p className={styles.tMission}>{team.mission}</p>
         <p className={styles.tStory}>{team.story}</p>
+        <div className={styles.tMeta}>
+          <span className={styles.tCount}>
+            <strong>{roster.length}</strong> people
+          </span>
+          <div className={styles.tFocus}>
+            {team.contributions.slice(0, 4).map((c) => (
+              <span key={c} className={styles.teamChip}>
+                {c}
+              </span>
+            ))}
+          </div>
+        </div>
       </motion.header>
 
-      {/* Leadership highlight */}
+      {/* B. The team — ONE composition: leadership highlighted but
+          integrated with everyone else, nothing in between */}
       <div className={styles.rosterGroup}>
         <motion.span className={styles.rosterLabel} variants={cardVariants}>
-          Leadership <span className={styles.rosterCount}>{leaders.length}</span>
+          The team <span className={styles.rosterCount}>{roster.length}</span>
         </motion.span>
-        <div className={styles.leadRow}>
+        <div className={styles.teamComposition}>
           {leaders.map((person) => (
             <PersonCard
               key={person.id}
@@ -795,33 +830,6 @@ function TeamChapter({
               onOpen={() => openPerson(person)}
             />
           ))}
-        </div>
-      </div>
-
-      {/* Activities carousel */}
-      <motion.div variants={cardVariants}>
-        <ActivityCarousel team={team} />
-      </motion.div>
-
-      {/* Capability / certification tiles */}
-      <motion.div className={styles.statGrid} variants={cardVariants}>
-        {tiles.map((s) => (
-          <div
-            key={s.label}
-            className={`${styles.statTile} ${s.filled ? styles.statTileFilled : ''}`}
-          >
-            <span className={styles.statValue}>{s.value}</span>
-            <span className={styles.statLabel}>{s.label}</span>
-          </div>
-        ))}
-      </motion.div>
-
-      {/* Full roster for this team only */}
-      <div className={styles.rosterGroup}>
-        <motion.span className={styles.rosterLabel} variants={cardVariants}>
-          The team <span className={styles.rosterCount}>{members.length}</span>
-        </motion.span>
-        <div className={styles.memberGrid}>
           {members.map((person) => (
             <PersonCard
               key={person.id}
@@ -833,6 +841,34 @@ function TeamChapter({
           ))}
         </div>
       </div>
+
+      {/* C. The team in numbers — capability / certification tiles */}
+      <div className={styles.rosterGroup}>
+        <motion.span className={styles.rosterLabel} variants={cardVariants}>
+          The team in numbers
+        </motion.span>
+        <motion.div className={styles.statGrid} variants={cardVariants}>
+          {tiles.map((s) => (
+            <div
+              key={s.label}
+              className={`${styles.statTile} ${s.filled ? styles.statTileFilled : ''}`}
+            >
+              <span className={styles.statValue}>{s.value}</span>
+              <span className={styles.statLabel}>{s.label}</span>
+            </div>
+          ))}
+        </motion.div>
+      </div>
+
+      {/* Second exit — keeps the other teams one click away */}
+      <motion.button
+        type="button"
+        className={`${styles.ctaBtn} ${styles.backBottom}`}
+        onClick={onBack}
+        variants={cardVariants}
+      >
+        ← Back to all teams
+      </motion.button>
     </motion.div>
   )
 }
@@ -842,6 +878,18 @@ function TeamsPeople() {
   const [selected, setSelected] = useState<TeamId | null>(null)
   const [modal, setModal] = useState<ModalState | null>(null)
   const anchorRef = useRef<HTMLDivElement>(null)
+
+  // Scroll-driven emphasis: as the team-card row travels up the
+  // viewport, the spotlight moves 1st → 2nd → 3rd card.
+  const gridRef = useRef<HTMLDivElement>(null)
+  const [emphasis, setEmphasis] = useState(0)
+  const { scrollYProgress: gridProgress } = useScroll({
+    target: gridRef,
+    offset: ['start 0.9', 'end 0.2'],
+  })
+  useMotionValueEvent(gridProgress, 'change', (v) => {
+    setEmphasis(Math.min(2, Math.max(0, Math.floor(v * 3))))
+  })
 
   const selectedTeam = teams.find((t) => t.id === selected) ?? null
 
@@ -860,7 +908,7 @@ function TeamsPeople() {
         lede={
           <>
             One Head of Department and three teams. Open a team to enter its chapter — identity,
-            leadership, current activities and the full roster.
+            people and the numbers behind the work.
           </>
         }
       />
@@ -879,8 +927,15 @@ function TeamsPeople() {
               transition: { duration: 0.3 },
             }}
           >
-            {/* Compact Head-of-Department strip */}
-            <Rise className={styles.headStrip}>
+            {/* Head-of-Department: own gold identity, not team red */}
+            <motion.div
+              className={styles.headStrip}
+              style={{ ['--accent' as string]: headAccent }}
+              initial={{ opacity: 0, y: reduce ? 0 : 30, scale: reduce ? 1 : 0.965 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, amount: 0.35 }}
+              transition={{ duration: 0.8, ease }}
+            >
               <span className={styles.headGhost} aria-hidden="true">
                 {initials(head.name)}
               </span>
@@ -891,6 +946,7 @@ function TeamsPeople() {
                 <span className={styles.headRole}>{head.role}</span>
                 <h3 className={styles.headName}>{head.name}</h3>
                 <p className={styles.headLine}>{head.superpower}</p>
+                <p className={styles.headQuote}>“{head.quote}”</p>
               </div>
               <button
                 type="button"
@@ -898,17 +954,17 @@ function TeamsPeople() {
                 onClick={() =>
                   setModal({
                     person: head,
-                    accent: '#e2001a',
+                    accent: headAccent,
                     label: `Head of Department · ${department.short}`,
                   })
                 }
               >
                 View details →
               </button>
-            </Rise>
+            </motion.div>
 
             {/* Team overview cards */}
-            <div className={styles.teamGrid}>
+            <div ref={gridRef} className={styles.teamGrid}>
               {teams.map((team, ti) => {
                 const count = people.filter((p) => p.team === team.id).length
                 return (
@@ -916,8 +972,17 @@ function TeamsPeople() {
                     <motion.button
                       type="button"
                       className={styles.teamCard}
-                      style={{ ['--accent' as string]: team.accentHex }}
+                      style={{ ['--accent' as string]: teamAccent[team.id] }}
                       onClick={() => goTo(team.id)}
+                      animate={
+                        reduce
+                          ? undefined
+                          : {
+                              scale: emphasis === ti ? 1.02 : 0.98,
+                              opacity: emphasis === ti ? 1 : 0.88,
+                            }
+                      }
+                      transition={{ duration: 0.5, ease }}
                       whileHover={reduce ? undefined : { y: -6 }}
                     >
                       <span className={styles.teamCardBar} aria-hidden="true" />
@@ -961,195 +1026,115 @@ function TeamsPeople() {
   )
 }
 
-/* ── 4. Journey — center-snapped milestone rail ────────────── */
+/* ── 4. In Motion — shared department-wide hot topics ──────── */
+function InMotion() {
+  return (
+    <Recede id="now" className={`${styles.section} ${styles.pulse}`}>
+      <ChapterHead
+        index="03"
+        label="In Motion"
+        title="What we're driving right now."
+        lede={
+          <>
+            A live pulse of the department — the initiatives and hot topics currently in motion
+            across all three teams.
+          </>
+        }
+      />
+      <Rise>
+        <HotTopicsCarousel items={hotTopics} />
+      </Rise>
+    </Recede>
+  )
+}
+
+/* ── 5. Journey — vertical scroll timeline ─────────────────── */
 function Journey() {
   const reduce = useReducedMotion()
-  const viewportRef = useRef<HTMLDivElement>(null)
-  const drag = useRef({ down: false, moved: false, startX: 0, startLeft: 0 })
-  const [progress, setProgress] = useState(0)
+  const railRef = useRef<HTMLDivElement>(null)
   const [activeIdx, setActiveIdx] = useState(0)
 
-  const measure = () => {
-    const el = viewportRef.current
-    if (!el) return
-    const max = el.scrollWidth - el.clientWidth
-    setProgress(max > 0 ? el.scrollLeft / max : 0)
-
-    const cards = el.querySelectorAll<HTMLElement>('[data-tl-card]')
-    const center = el.scrollLeft + el.clientWidth / 2
-    let best = 0
-    let bestDist = Infinity
-    cards.forEach((c, i) => {
-      const cc = c.offsetLeft + c.offsetWidth / 2
-      const d = Math.abs(cc - center)
-      if (d < bestDist) {
-        bestDist = d
-        best = i
-      }
-    })
-    setActiveIdx(best)
-  }
-
-  useEffect(() => {
-    measure()
-    window.addEventListener('resize', measure)
-    return () => window.removeEventListener('resize', measure)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  /** Center the milestone at `idx` in the viewport. */
-  const centerCard = (idx: number) => {
-    const el = viewportRef.current
-    if (!el) return
-    const clamped = Math.max(0, Math.min(timeline.length - 1, idx))
-    const card = el.querySelectorAll<HTMLElement>('[data-tl-card]')[clamped]
-    if (!card) return
-    el.scrollTo({
-      left: card.offsetLeft + card.offsetWidth / 2 - el.clientWidth / 2,
-      behavior: reduce ? 'auto' : 'smooth',
-    })
-  }
-
-  const onPointerDown = (e: React.PointerEvent) => {
-    const el = viewportRef.current
-    if (!el) return
-    drag.current = { down: true, moved: false, startX: e.clientX, startLeft: el.scrollLeft }
-    el.setPointerCapture(e.pointerId)
-  }
-  const onPointerMove = (e: React.PointerEvent) => {
-    const el = viewportRef.current
-    if (!el || !drag.current.down) return
-    const dx = e.clientX - drag.current.startX
-    if (Math.abs(dx) > 8) drag.current.moved = true
-    el.scrollLeft = drag.current.startLeft - dx
-  }
-  const onPointerUp = (e: React.PointerEvent) => {
-    drag.current.down = false
-    viewportRef.current?.releasePointerCapture(e.pointerId)
-  }
-
-  const milestoneVariants: Variants = {
-    hidden: { opacity: 0, y: reduce ? 0 : 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease } },
-  }
+  // The spine draws itself in as the decade scrolls past.
+  const { scrollYProgress } = useScroll({
+    target: railRef,
+    offset: ['start 0.72', 'end 0.5'],
+  })
+  const spineScale = useTransform(scrollYProgress, [0, 1], [0, 1])
 
   return (
     <Recede id="journey" className={`${styles.section} ${styles.journey}`}>
       <ChapterHead
-        index="03"
+        index="04"
         label="Journey"
         title="Ten years, told in milestones."
         lede={
           <>
-            From a small founding group to a department the company relies on — move through the
-            decade, one milestone at a time.
+            From a small founding group to a department the company relies on — the decade
+            unfolds as you scroll, one milestone at a time.
           </>
         }
       />
 
-      <Rise className={styles.tlControls}>
-        <span className={styles.tlHint}>
-          <span className={styles.tlHintDot} aria-hidden="true" />
-          Drag or use the arrows
-        </span>
-        <div className={styles.tlButtons}>
-          <button
-            type="button"
-            className={styles.iconBtn}
-            onClick={() => centerCard(activeIdx - 1)}
-            disabled={activeIdx === 0}
-            aria-label="Previous milestone"
-          >
-            ←
-          </button>
-          <span className={styles.tlCounter}>
-            {String(activeIdx + 1).padStart(2, '0')} / {String(timeline.length).padStart(2, '0')}
-          </span>
-          <button
-            type="button"
-            className={styles.iconBtn}
-            onClick={() => centerCard(activeIdx + 1)}
-            disabled={activeIdx === timeline.length - 1}
-            aria-label="Next milestone"
-          >
-            →
-          </button>
-        </div>
-      </Rise>
-
-      <div className={styles.tlStage}>
-        {/* Giant watermark of the active year — the decade anchor */}
-        <div className={styles.tlGhostWrap} aria-hidden="true">
+      <div ref={railRef} className={styles.tlRail}>
+        {/* Sticky watermark of the milestone currently in focus */}
+        <div className={styles.tlWatermark} aria-hidden="true">
           <AnimatePresence mode="wait">
             <motion.span
               key={timeline[activeIdx].year}
-              className={styles.tlGhostYear}
-              initial={{ opacity: 0, y: reduce ? 0 : 44 }}
+              className={styles.tlWatermarkYear}
+              initial={{ opacity: 0, y: reduce ? 0 : 40 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: reduce ? 0 : -44 }}
-              transition={{ duration: 0.45, ease }}
+              exit={{ opacity: 0, y: reduce ? 0 : -40 }}
+              transition={{ duration: 0.4, ease }}
             >
               {timeline[activeIdx].year}
             </motion.span>
           </AnimatePresence>
         </div>
 
-        <div
-          ref={viewportRef}
-          className={styles.timelineViewport}
-          onScroll={measure}
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerUp}
-      >
-        <div className={styles.timelineTrack}>
-          <span className={styles.timelineLine} aria-hidden="true" />
-          {timeline.map((m, i) => (
-            <motion.div
-              key={m.year}
-              data-tl-card
-              className={`${styles.tlCard} ${activeIdx === i ? styles.tlCardActive : ''} ${
-                m.major ? styles.tlCardMajor : ''
-              }`}
-              variants={milestoneVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.4 }}
-              onClick={() => {
-                if (!drag.current.moved) centerCard(i)
-              }}
-            >
-              <div className={styles.tlCardInner}>
-                <p className={`${styles.tlYear} ${m.major ? styles.tlYearMajor : ''}`}>{m.year}</p>
-                <div className={styles.tlNodeRow}>
-                  <span
-                    className={`${styles.tlNode} ${m.major ? styles.tlNodeMajor : ''}`}
-                    aria-hidden="true"
-                  />
-                </div>
-                <div className={styles.tlBody}>
-                  <h3 className={styles.tlTitle}>{m.title}</h3>
-                  <p className={styles.tlDesc}>{m.description}</p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-          </div>
+        {/* The spine: base line + scroll-linked fill */}
+        <div className={styles.tlSpine} aria-hidden="true">
+          <motion.span
+            className={styles.tlSpineFill}
+            style={reduce ? undefined : { scaleY: spineScale }}
+          />
         </div>
-      </div>
 
-      <div className={styles.tlProgress} aria-hidden="true">
-        <span
-          className={styles.tlProgressBar}
-          style={{ transform: `scaleX(${progress || 0.001})` }}
-        />
+        <ol className={styles.tlList}>
+          {timeline.map((m, i) => (
+            <motion.li
+              key={m.year}
+              className={`${styles.tlItem} ${i === activeIdx ? styles.tlItemActive : ''} ${
+                m.major ? styles.tlItemMajor : ''
+              }`}
+              initial={{ opacity: 0, y: reduce ? 0 : 46 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.35 }}
+              transition={{ duration: 0.6, ease }}
+            >
+              {/* Sentinel: marks this milestone active while it
+                  crosses the middle band of the viewport */}
+              <motion.span
+                className={styles.tlSentinel}
+                aria-hidden="true"
+                viewport={{ margin: '-44% 0px -44% 0px' }}
+                onViewportEnter={() => setActiveIdx(i)}
+              />
+              <span className={styles.tlNode} aria-hidden="true" />
+              <div className={styles.tlItemBody}>
+                <p className={styles.tlYear}>{m.year}</p>
+                <h3 className={styles.tlTitle}>{m.title}</h3>
+                <p className={styles.tlDesc}>{m.description}</p>
+              </div>
+            </motion.li>
+          ))}
+        </ol>
       </div>
     </Recede>
   )
 }
 
-/* ── 5. Voices from the Organization ───────────────────────── */
+/* ── 6. Voices from the Organization ───────────────────────── */
 function Voices() {
   const featured = messages.slice(0, 3)
 
@@ -1157,7 +1142,7 @@ function Voices() {
     <section id="voices" className={`${styles.section} ${styles.voices}`}>
       <div className={styles.voicesHead}>
         <MaskRise>
-          <span className={styles.eyebrow}>04 — Appreciation</span>
+          <span className={styles.eyebrow}>05 — Appreciation</span>
         </MaskRise>
         <h2 className={styles.voicesTitle}>
           <MaskRise delay={0.08}>Voices from the Organization</MaskRise>
@@ -1198,19 +1183,111 @@ function Voices() {
   )
 }
 
+/* ── Background music toggle ───────────────────────────────────
+   Browsers block autoplay with sound, so the control is visible
+   immediately but playback only ever starts from a user gesture:
+   · clicking the button, or
+   · (if the visitor previously chose "on" — persisted in
+     localStorage) the first interaction anywhere on the page.
+   AUDIO FILE: place the track at  public/audio/ppmd-theme.mp3
+   — until it exists the button simply stays in the "off" state. */
+
+const MUSIC_KEY = 'ppmd-music'
+const MUSIC_SRC = '/audio/ppmd-theme.mp3'
+
+function MusicToggle() {
+  const audioRef = useRef<HTMLAudioElement>(null)
+  const [playing, setPlaying] = useState(false)
+
+  const toggle = () => {
+    const el = audioRef.current
+    if (!el) return
+    if (playing) {
+      el.pause()
+      setPlaying(false)
+      try {
+        localStorage.setItem(MUSIC_KEY, 'off')
+      } catch {
+        /* storage unavailable — preference just won't persist */
+      }
+    } else {
+      el.volume = 0.35
+      el.play()
+        .then(() => setPlaying(true))
+        .catch(() => setPlaying(false)) // blocked or file missing
+      try {
+        localStorage.setItem(MUSIC_KEY, 'on')
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
+  // Visitor opted in previously → resume on the FIRST interaction
+  // (the gesture makes play() allowed by autoplay policies).
+  useEffect(() => {
+    let saved: string | null = null
+    try {
+      saved = localStorage.getItem(MUSIC_KEY)
+    } catch {
+      /* ignore */
+    }
+    if (saved !== 'on') return
+    const resume = () => {
+      const el = audioRef.current
+      if (!el) return
+      el.volume = 0.35
+      el.play()
+        .then(() => setPlaying(true))
+        .catch(() => {})
+    }
+    window.addEventListener('pointerdown', resume, { once: true })
+    window.addEventListener('keydown', resume, { once: true })
+    return () => {
+      window.removeEventListener('pointerdown', resume)
+      window.removeEventListener('keydown', resume)
+    }
+  }, [])
+
+  return (
+    <>
+      {/* eslint-disable-next-line jsx-a11y/media-has-caption -- background music */}
+      <audio ref={audioRef} src={MUSIC_SRC} loop preload="none" />
+      <button
+        type="button"
+        className={`${styles.musicBtn} ${playing ? styles.musicOn : ''}`}
+        onClick={toggle}
+        aria-pressed={playing}
+        aria-label={playing ? 'Pause background music' : 'Play background music'}
+        title={playing ? 'Pause background music' : 'Play background music'}
+      >
+        <span className={styles.musicBars} aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </span>
+        Music
+      </button>
+    </>
+  )
+}
+
 /* ── Root ──────────────────────────────────────────────────── */
 export default function AppPrototype() {
   return (
     <div className={styles.root}>
       <Atmosphere />
+      <MusicToggle />
       <Hero />
       {/* Every chapter after the hero lives in one panel that
           slides up OVER the pinned hero scene. */}
       <div className={styles.panel}>
         <Foundation />
         <TeamsPeople />
+        <InMotion />
         <Journey />
         <Voices />
+        <footer className={styles.credit}>Made by Valentin Stoev</footer>
       </div>
     </div>
   )
