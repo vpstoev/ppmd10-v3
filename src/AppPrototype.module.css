@@ -331,7 +331,7 @@
 .heroNumber {
   display: block;
   font-family: var(--font-display, var(--font-sans));
-  font-size: max(9rem, min(50vh, 38vw));
+  font-size: max(10rem, min(56vh, 42vw));
   font-weight: 800;
   line-height: 0.78;
   letter-spacing: -0.05em;
@@ -349,7 +349,7 @@
 }
 .heroYearsWord {
   font-family: var(--font-display, var(--font-sans));
-  font-size: max(3rem, min(17.5vh, 12vw));
+  font-size: max(3.2rem, min(20vh, 13.5vw));
   font-weight: 800;
   letter-spacing: 0.01em;
   text-transform: uppercase;
@@ -1010,17 +1010,35 @@
 }
 
 /* ONE composition: leadership highlighted, but inside the same
-   grid as everyone else — the team reads as a single unit */
+   grid as everyone else — the team reads as a single unit.
+   ALL cards share equal tracks; ONLY the PM featured leadership
+   row is allowed a wider span. Columns: 1 → 2 → 3 → 5. */
 .teamComposition {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: 1fr;
   gap: clamp(0.8rem, 1.6vw, 1.15rem);
 }
-.teamComposition .personCardLead {
-  grid-column: span 2;
+@media (min-width: 560px) {
+  .teamComposition {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .teamComposition .personCardFeatured {
+    grid-column: span 2;
+  }
 }
-/* Wide screens: a 15-track grid → leads 3-up (narrower than
-   before), members exactly 5 per row, slightly larger */
+@media (min-width: 900px) {
+  .teamComposition {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .teamComposition .personCard {
+    grid-column: span 2;
+  }
+  .teamComposition .personCardFeatured {
+    grid-column: span 3;
+  }
+}
+/* Large desktop: 15 equal tracks → members exactly 5 per row
+   (PM: 5 + 5 + 3), PM featured leads exactly 3 per row */
 @media (min-width: 1280px) {
   .teamComposition {
     grid-template-columns: repeat(15, minmax(0, 1fr));
@@ -1028,7 +1046,7 @@
   .teamComposition .personCard {
     grid-column: span 3;
   }
-  .teamComposition .personCardLead {
+  .teamComposition .personCardFeatured {
     grid-column: span 5;
   }
 }
@@ -1063,9 +1081,9 @@
 .teamComposition .personCard:not(.personCardLead):nth-child(3n + 2) {
   background: linear-gradient(175deg, #181420, #0f0d15 75%);
 }
-/* rhythm: alternating avatar geometry */
+/* rhythm: alternating portrait geometry (size never changes) */
 .teamComposition .personCard:nth-child(2n) .personAvatar {
-  border-radius: 14px;
+  border-radius: 50%;
 }
 /* rhythm: an accent tick opens every fourth card */
 .teamComposition .personCard:not(.personCardLead):nth-child(4n + 1)::before {
@@ -1079,14 +1097,19 @@
   background: var(--accent);
   opacity: 0.75;
 }
+/* Leadership HIGHLIGHT — badge + accent + surface. */
 .personCardLead {
   gap: 1rem;
-  padding: clamp(1.4rem, 2.4vw, 1.8rem);
   border-color: color-mix(in srgb, var(--accent) 34%, var(--p-line-strong));
   background:
     radial-gradient(80% 120% at 0% 0%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 58%),
     linear-gradient(175deg, var(--p-surface-2), #0e0c12 75%);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+/* Featured leadership card — larger. Applied ONLY to: PM Team
+   Lead + 2 Program Managers, PP Team Lead, BPT Team Lead. */
+.personCardFeatured {
+  padding: clamp(1.4rem, 2.4vw, 1.8rem);
 }
 .personLeadTag {
   align-self: flex-start;
@@ -1099,10 +1122,19 @@
   border-radius: 999px;
   border: 1px solid color-mix(in srgb, var(--accent) 42%, transparent);
 }
+/* Photo-first layout: the portrait sits ON TOP as a real frame,
+   ready for a colleague photograph — not a decorative icon */
 .personTop {
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+/* featured PM leadership cards are wide → portrait beside text */
+.personCardFeatured .personTop {
+  flex-direction: row;
   align-items: center;
-  gap: 0.8rem;
+  gap: 1.1rem;
 }
 .personIdent {
   min-width: 0;
@@ -1110,7 +1142,6 @@
 .personAvatar,
 .personAvatarLead {
   flex-shrink: 0;
-  border-radius: 50%;
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -1120,15 +1151,19 @@
   background: linear-gradient(150deg, #2c2634, #17131d);
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 55%, transparent);
 }
+/* Regular portrait: 120px — a real photo area, every team */
 .personAvatar {
-  width: 3.5rem;
-  height: 3.5rem;
-  font-size: 1.05rem;
+  width: 120px;
+  height: 120px;
+  border-radius: 22px;
+  font-size: 1.8rem;
 }
+/* Leadership portrait: 140px, visibly larger, fixed */
 .personAvatarLead {
-  width: 6rem;
-  height: 6rem;
-  font-size: 1.7rem;
+  width: 140px;
+  height: 140px;
+  border-radius: 26px;
+  font-size: 2.3rem;
   background: linear-gradient(150deg, color-mix(in srgb, var(--accent) 68%, #221d28), color-mix(in srgb, var(--accent) 30%, #14111a));
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
 }
@@ -1145,7 +1180,7 @@
   line-height: 1.15;
   margin: 0;
 }
-.personCardLead .personName {
+.personCardFeatured .personName {
   font-size: 1.3rem;
 }
 .personRole {
@@ -1598,21 +1633,30 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: clamp(2.2rem, 6vh, 4.2rem);
+  /* roomy: the 1.18 active scale + 18px lift never collides */
+  gap: clamp(2.8rem, 7vh, 4.6rem);
 }
 
-/* Milestones alternate sides around the central spine */
+/* Milestones alternate sides around the central spine.
+   The ACTIVE item stacks above its neighbours so the enlarged
+   card is never clipped or covered. */
 .tlItem {
   position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: minmax(0, 1fr) clamp(3rem, 6vw, 5rem) minmax(0, 1fr);
   align-items: start;
+}
+.tlItemActive {
+  z-index: 3;
 }
 .tlSentinel {
   position: absolute;
   inset: 0;
   pointer-events: none;
 }
+/* Scale / lift / dim are driven by motion (spring) in the TSX;
+   CSS only carries the surface, border and glow states. */
 .tlItemBody {
   grid-column: 3;
   grid-row: 1;
@@ -1621,8 +1665,8 @@
   border-radius: 18px;
   border: 1px solid transparent;
   transform-origin: left center;
-  transition: background 0.45s ease, border-color 0.45s ease,
-    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
+  transition: background 0.45s ease, border-color 0.45s ease, box-shadow 0.45s ease;
 }
 .tlItem:nth-child(even) .tlItemBody {
   grid-column: 1;
@@ -1631,9 +1675,12 @@
   transform-origin: right center;
 }
 .tlItemActive .tlItemBody {
-  background: linear-gradient(175deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.008));
-  border-color: var(--p-line);
-  transform: scale(1.045);
+  background: linear-gradient(175deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.015));
+  border-color: color-mix(in srgb, var(--p-red-bright) 60%, var(--p-line-strong));
+  box-shadow:
+    0 30px 80px -28px rgba(226, 0, 26, 0.6),
+    0 12px 44px -18px rgba(0, 0, 0, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .tlNode {
@@ -1929,6 +1976,10 @@
     grid-column: 2;
     justify-self: start;
     text-align: left;
+    transform-origin: left center;
+    /* leave headroom so the 1.18 active scale never clips at the
+       right edge on narrow screens */
+    max-width: 84%;
   }
   .tlItem:nth-child(even) .tlDesc {
     margin-left: 0;
@@ -2009,12 +2060,6 @@
   }
   .headStrip {
     grid-template-columns: 1fr;
-  }
-  .teamComposition {
-    grid-template-columns: 1fr;
-  }
-  .teamComposition .personCardLead {
-    grid-column: auto;
   }
 }
 

@@ -309,13 +309,14 @@ function Hero() {
   const backScale = useTransform(scrollYProgress, [0, 1], [1, 1.22])
   const backY = useTransform(scrollYProgress, [0, 1], [0, -70])
   const backOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.1])
-  // The lockup STARTS slightly compact, grows past full size on the
-  // first scroll (while the supporting line reveals), then recedes.
-  const midScale = useTransform(scrollYProgress, [0, 0.3, 1], [0.92, 1.06, 0.66])
-  const midY = useTransform(scrollYProgress, [0, 0.3, 1], [0, -6, -230])
-  const midOpacity = useTransform(scrollYProgress, [0, 0.55, 0.92], [1, 1, 0])
-  const revealOpacity = useTransform(scrollYProgress, [0.06, 0.24], [0, 1])
-  const revealY = useTransform(scrollYProgress, [0.06, 0.24], [36, 0])
+  // The lockup opens STRONG (0.96 — already impressive), energizes
+  // past full size (1.07) while the supporting line reveals, then
+  // recedes upward as the panel enters.
+  const midScale = useTransform(scrollYProgress, [0, 0.35, 0.7, 1], [0.96, 1.07, 1, 0.93])
+  const midY = useTransform(scrollYProgress, [0, 0.35, 0.7, 1], [12, 0, -20, -90])
+  const midOpacity = useTransform(scrollYProgress, [0, 0.7, 1], [1, 1, 0.25])
+  const revealOpacity = useTransform(scrollYProgress, [0, 0.12, 0.3, 0.72, 1], [0, 0, 1, 1, 0])
+  const revealY = useTransform(scrollYProgress, [0.12, 0.3], [24, 0])
   const frontY = useTransform(scrollYProgress, [0, 0.55], [0, 170])
   const frontOpacity = useTransform(scrollYProgress, [0.06, 0.45], [1, 0])
   const barsOpacity = useTransform(scrollYProgress, [0, 0.22], [1, 0])
@@ -402,10 +403,12 @@ function Hero() {
               className={styles.heroReveal}
               style={reduce ? undefined : { opacity: revealOpacity, y: revealY }}
             >
-              For a whole decade we have helped {department.company} stay a market leader —
-              growing our people, adapting to every change, and keeping the customer at the
-              centre of everything we deliver.{' '}
-              <em>In the biggest challenges, we are the department the company counts on.</em>
+              For a decade, we have helped {department.company} lead through continuous growth,
+              adaptability and a customer-first mindset.{' '}
+              <em>
+                When the challenge is complex and the stakes are high, we are the department the
+                business trusts to deliver.
+              </em>
             </motion.p>
           </motion.div>
 
@@ -534,12 +537,17 @@ function PersonCard({
   person,
   team,
   lead,
+  featured,
   onOpen,
   variants,
 }: {
   person: Person
   team: Team
+  /** Leadership HIGHLIGHT (badge, accent, surface) — any team. */
   lead?: boolean
+  /** Larger card + larger portrait. Allowed ONLY for: PM Team
+   *  Lead + 2 Program Managers, PP Team Lead, BPT Team Lead. */
+  featured?: boolean
   onOpen: () => void
   variants: Variants
 }) {
@@ -547,7 +555,9 @@ function PersonCard({
   return (
     <motion.button
       type="button"
-      className={`${styles.personCard} ${lead ? styles.personCardLead : ''}`}
+      className={`${styles.personCard} ${lead ? styles.personCardLead : ''} ${
+        featured ? styles.personCardFeatured : ''
+      }`}
       style={{ ['--accent' as string]: teamAccent[team.id] }}
       variants={variants}
       onClick={onOpen}
@@ -555,7 +565,10 @@ function PersonCard({
     >
       {lead && <span className={styles.personLeadTag}>{person.role}</span>}
       <div className={styles.personTop}>
-        <Avatar person={person} className={lead ? styles.personAvatarLead : styles.personAvatar} />
+        <Avatar
+          person={person}
+          className={featured ? styles.personAvatarLead : styles.personAvatar}
+        />
         <div className={styles.personIdent}>
           <h4 className={styles.personName}>{person.name}</h4>
           <p className={styles.personRole}>{person.role}</p>
@@ -820,12 +833,15 @@ function TeamChapter({
           The team <span className={styles.rosterCount}>{roster.length}</span>
         </motion.span>
         <div className={styles.teamComposition}>
+          {/* `leaders` is exactly the allowed featured set: PM Team
+              Lead + 2 Program Managers; PP / BPT Team Lead only. */}
           {leaders.map((person) => (
             <PersonCard
               key={person.id}
               person={person}
               team={team}
               lead
+              featured
               variants={cardVariants}
               onOpen={() => openPerson(person)}
             />
@@ -1121,11 +1137,23 @@ function Journey() {
                 onViewportEnter={() => setActiveIdx(i)}
               />
               <span className={styles.tlNode} aria-hidden="true" />
-              <div className={styles.tlItemBody}>
+              {/* Focused milestone springs up (1.18, lifted); the
+                  others clearly settle back (0.88, dimmed). */}
+              <motion.div
+                className={styles.tlItemBody}
+                animate={
+                  reduce
+                    ? undefined
+                    : i === activeIdx
+                      ? { scale: 1.18, y: -18, opacity: 1 }
+                      : { scale: 0.88, y: 0, opacity: 0.45 }
+                }
+                transition={{ type: 'spring', stiffness: 240, damping: 24 }}
+              >
                 <p className={styles.tlYear}>{m.year}</p>
                 <h3 className={styles.tlTitle}>{m.title}</h3>
                 <p className={styles.tlDesc}>{m.description}</p>
-              </div>
+              </motion.div>
             </motion.li>
           ))}
         </ol>
