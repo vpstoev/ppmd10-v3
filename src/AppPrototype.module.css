@@ -215,6 +215,7 @@
   position: sticky;
   top: 0;
   height: 100vh;
+  height: 100svh; /* fit the VISIBLE viewport, incl. browser chrome */
   overflow: hidden;
 }
 
@@ -334,7 +335,9 @@
 .heroNumber {
   display: block;
   font-family: var(--font-display, var(--font-sans));
-  font-size: max(10rem, min(56vh, 42vw));
+  /* ~18% below the previous 56vh/42vw — dominant, but leaves room
+     for the department row + narrative underneath */
+  font-size: max(8.5rem, min(46vh, 34vw));
   font-weight: 800;
   line-height: 0.78;
   letter-spacing: -0.05em;
@@ -347,12 +350,12 @@
 .heroYears {
   display: flex;
   flex-direction: column;
-  gap: clamp(0.6rem, 1.8vh, 1.3rem);
-  padding-bottom: clamp(0.5rem, 2.5vh, 2rem);
+  gap: clamp(0.5rem, 1.4vh, 1rem);
+  padding-bottom: clamp(0.4rem, 1.5vh, 1.2rem);
 }
 .heroYearsWord {
   font-family: var(--font-display, var(--font-sans));
-  font-size: max(3.2rem, min(20vh, 13.5vw));
+  font-size: max(2.8rem, min(15vh, 11vw));
   font-weight: 800;
   letter-spacing: 0.01em;
   text-transform: uppercase;
@@ -367,14 +370,16 @@
   color: var(--p-amber);
 }
 
-/* Department band — identity as part of the lockup composition */
+/* Department band — identity as part of the lockup composition.
+   Gaps compressed ~40% so lockup / identity / narrative read as
+   ONE composition. */
 .heroDeptBand {
   display: flex;
   align-items: baseline;
   gap: clamp(0.8rem, 2vw, 1.6rem);
   flex-wrap: wrap;
-  margin-top: clamp(1.1rem, 3vh, 2.2rem);
-  padding-top: clamp(0.8rem, 2vh, 1.3rem);
+  margin-top: clamp(0.7rem, 1.8vh, 1.3rem);
+  padding-top: clamp(0.5rem, 1.2vh, 0.8rem);
   border-top: 1px solid var(--p-line-strong);
 }
 .heroDeptShort {
@@ -404,12 +409,36 @@
   color: var(--p-ink-faint);
 }
 
+/* THE single narrative block: short headline + two-sentence
+   supporting copy, directly beneath the department row */
+.heroNarrative {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.4rem, 1vh, 0.65rem);
+  margin-top: clamp(0.7rem, 1.6vh, 1.1rem);
+  max-width: min(64ch, 660px);
+}
+.heroHeadline {
+  font-family: var(--font-display, var(--font-sans));
+  font-size: clamp(1.1rem, 1.55vw, 1.45rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+.heroHeadline em {
+  font-style: normal;
+  background: var(--p-hallmark);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
 /* Supporting sentence — revealed by the first scroll */
 .heroReveal {
-  margin: clamp(0.9rem, 2.4vh, 1.6rem) 0 0;
-  max-width: min(64ch, 680px);
-  font-size: clamp(0.95rem, 1.25vw, 1.15rem);
-  line-height: 1.7;
+  margin: 0;
+  font-size: clamp(0.92rem, 1.1vw, 1.08rem);
+  line-height: 1.6;
   color: var(--p-ink-soft);
   will-change: transform, opacity;
 }
@@ -421,51 +450,18 @@
   color: transparent;
 }
 
-/* Foreground: headline strip + scroll cue on the bottom bar */
+/* Foreground: slim scroll-cue bar only (the narrative lives in
+   the mid composition — ONE text block, not two) */
 .heroBottom {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
   gap: 2rem;
-  padding-top: clamp(1rem, 2.4vh, 1.5rem);
+  padding-top: clamp(0.8rem, 1.8vh, 1.2rem);
   border-top: 1px solid var(--p-line);
   color: var(--p-ink-soft);
   font-size: 0.78rem;
   will-change: transform, opacity;
-}
-.heroCopy {
-  min-width: 0;
-}
-.heroHeadline {
-  font-family: var(--font-display, var(--font-sans));
-  font-size: clamp(1.25rem, 2.1vw, 1.9rem);
-  font-weight: 600;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  margin: 0;
-  max-width: 44ch;
-  text-wrap: balance;
-}
-.heroHeadline em {
-  font-style: normal;
-  background: var(--p-hallmark);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-.heroIntro {
-  margin: 0.7rem 0 0;
-  max-width: 66ch;
-  font-size: clamp(0.88rem, 1vw, 1rem);
-  line-height: 1.6;
-  color: var(--p-ink-soft);
-}
-.heroCue {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.75rem;
-  white-space: nowrap;
 }
 .heroScroll {
   display: inline-flex;
@@ -1957,11 +1953,9 @@
     display: none;
   }
   .heroBottom {
-    grid-template-columns: 1fr;
-    gap: 1.1rem;
-  }
-  .heroCue {
+    flex-direction: column;
     align-items: flex-start;
+    gap: 0.6rem;
   }
   /* timeline collapses to a left spine, single column */
   .tlSpine {
@@ -2053,16 +2047,60 @@
     gap: 0.8rem;
   }
   .heroNumber {
-    font-size: max(8rem, min(40vh, 58vw));
+    font-size: max(6.5rem, min(34vh, 52vw));
   }
   .heroYearsWord {
-    font-size: max(2.6rem, 15vw);
+    font-size: max(2.3rem, 13vw);
   }
   .heroDeptCo {
     margin-left: 0;
   }
   .headStrip {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ── Height-aware hero fit (1536×864, 1366×768 and shorter) ── */
+@media (max-height: 900px) {
+  .heroFrame {
+    padding-block: clamp(0.8rem, 1.8vh, 1.4rem) clamp(0.9rem, 2vh, 1.5rem);
+  }
+  .heroNumber {
+    font-size: max(7.5rem, min(40vh, 30vw));
+  }
+  .heroYearsWord {
+    font-size: max(2.5rem, min(13vh, 9.5vw));
+  }
+  .heroDeptBand {
+    margin-top: clamp(0.6rem, 1.4vh, 1rem);
+    padding-top: 0.5rem;
+  }
+  .heroNarrative {
+    margin-top: clamp(0.5rem, 1.2vh, 0.8rem);
+  }
+}
+@media (max-height: 780px) {
+  .heroNumber {
+    font-size: max(6.5rem, min(36vh, 27vw));
+  }
+  .heroYearsWord {
+    font-size: max(2.2rem, min(11.5vh, 8.5vw));
+  }
+  .heroDeptShort {
+    font-size: clamp(1.4rem, 2.8vw, 2.4rem);
+  }
+  .heroDeptName {
+    font-size: clamp(0.95rem, 1.7vw, 1.5rem);
+  }
+  .heroHeadline {
+    font-size: clamp(1rem, 1.4vw, 1.25rem);
+  }
+  .heroReveal {
+    font-size: clamp(0.88rem, 1vw, 0.98rem);
+    line-height: 1.5;
+  }
+  .heroTop {
+    font-size: 0.66rem;
   }
 }
 

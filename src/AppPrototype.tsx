@@ -313,7 +313,7 @@ function Hero() {
   // past full size (1.07) while the supporting line reveals, then
   // recedes upward as the panel enters. Opacity stays at 1 until
   // the final exit phase (never dimmed while readable).
-  const midScale = useTransform(scrollYProgress, [0, 0.34, 0.72, 1], [0.96, 1.07, 1, 0.93])
+  const midScale = useTransform(scrollYProgress, [0, 0.34, 0.72, 1], [0.96, 1.04, 1, 0.93])
   const midY = useTransform(scrollYProgress, [0, 0.34, 0.72, 1], [12, 0, -18, -80])
   const midOpacity = useTransform(scrollYProgress, [0, 0.78, 1], [1, 1, 0.22])
   const revealOpacity = useTransform(scrollYProgress, [0, 0.14, 0.3, 0.74, 1], [0, 0, 1, 1, 0])
@@ -342,10 +342,10 @@ function Hero() {
             giant outlined wordmark */}
         <div className={styles.heroArch} aria-hidden="true" />
         <span className={styles.heroEdge} aria-hidden="true">
-          Est. 2015
+          Est. 2016
         </span>
         <span className={`${styles.heroEdge} ${styles.heroEdgeRight}`} aria-hidden="true">
-          Anniversary · 2025
+          Anniversary · 2026
         </span>
         <div className={styles.heroGhostWrap} aria-hidden="true">
           <motion.span
@@ -374,7 +374,7 @@ function Hero() {
               <strong className={styles.heroTopMark}>{department.company} Bulgaria</strong> ·{' '}
               {department.name}
             </span>
-            <span>Anniversary Edition · 2015 — 2025</span>
+            <span>Anniversary Edition · 2016 — 2026</span>
           </motion.div>
 
           {/* Midground layer: the anniversary statement */}
@@ -389,7 +389,7 @@ function Hero() {
               </span>
               <span className={styles.heroYears}>
                 <span className={styles.heroYearsWord}>Years</span>
-                <span className={styles.heroYearsRange}>2015 — 2025</span>
+                <span className={styles.heroYearsRange}>2016 — 2026</span>
               </span>
             </motion.div>
 
@@ -399,40 +399,38 @@ function Hero() {
               <span className={styles.heroDeptCo}>{department.company} Bulgaria</span>
             </motion.div>
 
-            {/* Supporting line — revealed by the first scroll */}
-            <motion.p
-              className={styles.heroReveal}
-              style={reduce ? undefined : { opacity: revealOpacity, y: revealY }}
-            >
-              For a decade, we have helped {department.company} lead through continuous growth,
-              adaptability and a customer-first mindset.{' '}
-              <em>
-                When the challenge is complex and the stakes are high, we are the department the
-                business trusts to deliver.
-              </em>
-            </motion.p>
+            {/* ONE narrative block: short headline + the two-sentence
+                supporting copy (revealed by the first scroll) */}
+            <div className={styles.heroNarrative}>
+              <motion.h1 className={styles.heroHeadline} variants={enter}>
+                A decade of delivery, structure and quality —{' '}
+                <em>and the people behind all of it.</em>
+              </motion.h1>
+              <motion.p
+                className={styles.heroReveal}
+                style={reduce ? undefined : { opacity: revealOpacity, y: revealY }}
+              >
+                For a decade, we have helped {department.company} lead through continuous growth,
+                adaptability and a customer-first mindset.{' '}
+                <em>
+                  When the challenge is complex and the stakes are high, we are the department the
+                  business trusts to deliver.
+                </em>
+              </motion.p>
+            </div>
           </motion.div>
 
-          {/* Foreground layer: headline strip + scroll cue */}
+          {/* Foreground layer: slim scroll-cue bar only */}
           <motion.div
             className={styles.heroBottom}
             variants={enter}
             style={reduce ? undefined : { y: frontY, opacity: frontOpacity }}
           >
-            <div className={styles.heroCopy}>
-              <h1 className={styles.heroHeadline}>
-                A decade of delivery, structure and quality —{' '}
-                <em>and the people behind all of it.</em>
-              </h1>
-              <p className={styles.heroIntro}>{department.intro}</p>
-            </div>
-            <div className={styles.heroCue}>
-              <span className={styles.heroScroll}>
-                <span className={styles.heroScrollLine} aria-hidden="true" />
-                Scroll to begin
-              </span>
-              <span className={styles.heroNext}>Next — 01 Foundation</span>
-            </div>
+            <span className={styles.heroScroll}>
+              <span className={styles.heroScrollLine} aria-hidden="true" />
+              Scroll to begin
+            </span>
+            <span className={styles.heroNext}>Next — 01 Foundation</span>
           </motion.div>
         </motion.div>
       </div>
@@ -1222,7 +1220,8 @@ function Voices() {
    — until it exists the button simply stays in the "off" state. */
 
 const MUSIC_KEY = 'ppmd-music'
-const MUSIC_SRC = '/audio/ppmd-theme.mp3'
+// BASE_URL-aware so the track also resolves under /ppmd10/ on GitHub Pages
+const MUSIC_SRC = `${import.meta.env.BASE_URL}audio/ppmd-theme.mp3`
 
 function MusicToggle() {
   const audioRef = useRef<HTMLAudioElement>(null)
