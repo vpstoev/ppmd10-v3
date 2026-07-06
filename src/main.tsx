@@ -14,11 +14,13 @@ import './index.css'
 import HgInspiredHero from './HgInspiredHero.tsx'
 import WhatPpmdMakesPossible from './WhatPpmdMakesPossible.tsx'
 import TenYearsInMotion from './TenYearsInMotion.tsx'
+import ProjectsThatShapedTheDecade from './ProjectsThatShapedTheDecade.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <HgInspiredHero />
     <WhatPpmdMakesPossible />
     <TenYearsInMotion />
+    <ProjectsThatShapedTheDecade />
   </StrictMode>,
 )
