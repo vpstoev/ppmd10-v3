@@ -1,0 +1,278 @@
+/* "Ten Years in Motion" — cinematic timeline on a continuous particle
+   time path. Deep ink base throughout; giant environmental years;
+   varied but coherent editorial placements per milestone. */
+
+.container {
+  position: relative;
+  background: #07070c;
+  font-family: 'Geist Variable', 'Geist', system-ui, sans-serif;
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+
+.canvasLayer {
+  position: absolute;
+  inset: 0;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── Section title ───────────────────────────────────────── */
+.title {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(14px, 2.6vh, 24px);
+  text-align: center;
+  padding: 0 22px;
+}
+
+.titleMain {
+  margin: 0;
+  font-family: inherit;
+  font-size: clamp(34px, 4.6vw, 84px);
+  font-weight: 720;
+  font-variation-settings: 'wght' 720;
+  line-height: 1;
+  letter-spacing: -0.028em;
+  color: #f5efe4;
+  text-shadow: 0 2px 26px rgba(4, 4, 8, 0.8);
+}
+
+.titleYears {
+  font-size: clamp(13px, 1.9vh, 17px);
+  font-weight: 600;
+  letter-spacing: 0.4em;
+  text-indent: 0.4em;
+  color: #e8c188;
+}
+
+/* ── Milestones ──────────────────────────────────────────── */
+.milestone {
+  position: absolute;
+  inset: 0;
+}
+
+/* Giant environmental year — part of the scene, not a heading */
+.bigYear {
+  position: absolute;
+  font-size: clamp(180px, 30vw, 520px);
+  font-weight: 760;
+  font-variation-settings: 'wght' 760;
+  line-height: 0.8;
+  letter-spacing: -0.045em;
+  user-select: none;
+  will-change: transform, opacity;
+}
+.bigYearIridescent {
+  background: linear-gradient(100deg, #ff6e79 0%, #9d6bff 34%, #7cc4ff 66%, #e8c188 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  opacity: 0.32;
+}
+
+.content {
+  position: absolute;
+  max-width: min(40vw, 560px);
+}
+.maskWrap {
+  overflow: hidden;
+}
+.contentInner {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 2vh, 18px);
+  text-shadow: 0 2px 22px rgba(4, 4, 8, 0.78);
+}
+
+.meta {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  font-size: clamp(12px, 1.7vh, 14.5px);
+  font-weight: 640;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+}
+.metaYear {
+  font-size: clamp(15px, 2.3vh, 19px);
+  font-weight: 720;
+  letter-spacing: 0.08em;
+}
+
+.milestoneTitle {
+  margin: 0;
+  font-family: inherit;
+  font-size: clamp(28px, 3.2vw, 56px);
+  font-weight: 700;
+  font-variation-settings: 'wght' 700;
+  line-height: 1;
+  letter-spacing: -0.026em;
+  color: #f5efe4;
+  text-wrap: balance;
+}
+
+.description {
+  max-width: 40ch;
+  font-size: clamp(15px, 2.1vh, 18px);
+  line-height: 1.6;
+  color: rgba(245, 239, 228, 0.78);
+}
+
+/* ── Editorial layout variants (coherent grid, varied placement) ── */
+/* 2016 — year left, content lower right; path begins forming */
+.m0 .bigYear { left: -4vw; top: 12vh; }
+.m0 .content { right: 7vw; bottom: 12vh; }
+
+/* 2018 — content upper-left, year right */
+.m1 .bigYear { right: -6vw; top: 18vh; }
+.m1 .content { left: 7vw; top: 13vh; }
+
+/* 2020 — year centre-back, content lower-left */
+.m2 .bigYear { left: 50%; top: 7vh; transform-origin: top center; margin-left: -15vw; }
+.m2 .content { left: 7vw; bottom: 12vh; }
+
+/* 2022 — year lower-left, content right-centre */
+.m3 .bigYear { left: -5vw; bottom: 4vh; }
+.m3 .content { right: 7vw; top: 50%; translate: 0 -50%; }
+
+/* 2024 — larger year upper, content lower-left */
+.m4 .bigYear { left: 6vw; top: 4vh; font-size: clamp(200px, 36vw, 600px); }
+.m4 .content { left: 7vw; bottom: 10vh; }
+
+/* 2026 — calm, confident: year right-centre, content left-centre */
+.m5 .bigYear { right: -3vw; top: 50%; translate: 0 -50%; }
+.m5 .content { left: 8vw; top: 50%; translate: 0 -50%; }
+
+/* ── Closing ─────────────────────────────────────────────── */
+.closing {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(16px, 3vh, 28px);
+  text-align: center;
+  padding: 0 clamp(22px, 6vw, 110px);
+}
+
+.closingMain {
+  margin: 0;
+  font-family: inherit;
+  font-size: clamp(30px, 4.4vw, 80px);
+  font-weight: 720;
+  font-variation-settings: 'wght' 720;
+  line-height: 1.02;
+  letter-spacing: -0.028em;
+  color: #f5efe4;
+  text-shadow: 0 2px 26px rgba(4, 4, 8, 0.8);
+  text-wrap: balance;
+}
+
+.closingNext {
+  max-width: 56ch;
+  font-size: clamp(13px, 1.9vh, 17px);
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, #ff6e79 0%, #9d6bff 36%, #7cc4ff 68%, #e8c188 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ── Mobile ──────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .titleMain {
+    font-size: clamp(28px, 8.6vw, 38px);
+  }
+  /* One coherent mobile scheme: year upper, content lower half */
+  .m0 .bigYear,
+  .m1 .bigYear,
+  .m2 .bigYear,
+  .m3 .bigYear,
+  .m4 .bigYear,
+  .m5 .bigYear {
+    left: 4vw;
+    right: auto;
+    top: 9vh;
+    bottom: auto;
+    margin-left: 0;
+    translate: none;
+    font-size: clamp(120px, 34vw, 160px);
+  }
+  .m0 .content,
+  .m1 .content,
+  .m2 .content,
+  .m3 .content,
+  .m4 .content,
+  .m5 .content {
+    left: 22px;
+    right: 22px;
+    top: auto;
+    bottom: 9vh;
+    translate: none;
+    max-width: 100%;
+  }
+  .milestoneTitle {
+    font-size: clamp(24px, 7vw, 30px);
+  }
+  .description {
+    font-size: 15px;
+    max-width: 34ch;
+  }
+  .closingMain {
+    font-size: clamp(26px, 7.6vw, 34px);
+  }
+  .closingNext {
+    font-size: 11.5px;
+    letter-spacing: 0.16em;
+  }
+}
+
+/* ── No-WebGL fallback ───────────────────────────────────── */
+.fallback {
+  background: #07070c;
+  font-family: 'Geist Variable', 'Geist', system-ui, sans-serif;
+}
+
+.fbBlock {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(10px, 2vh, 18px);
+  padding: 12vh clamp(24px, 8vw, 150px);
+  overflow: hidden;
+}
+
+.fbTitle,
+.fbClosing {
+  align-items: center;
+  text-align: center;
+}
+
+.fbYear {
+  font-size: clamp(120px, 22vw, 320px);
+  font-weight: 760;
+  line-height: 0.85;
+  letter-spacing: -0.045em;
+  user-select: none;
+}
