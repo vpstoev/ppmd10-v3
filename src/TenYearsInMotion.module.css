@@ -138,9 +138,9 @@
 .m0 .bigYear { left: -4vw; top: 12vh; }
 .m0 .content { right: 7vw; bottom: 12vh; }
 
-/* 2018 — content upper-left, year right */
+/* 2018 — content left-centre, year right (2017 now owns upper-left) */
 .m1 .bigYear { right: -6vw; top: 18vh; }
-.m1 .content { left: 7vw; top: 13vh; }
+.m1 .content { left: 7vw; top: 50%; translate: 0 -50%; }
 
 /* 2020 — year centre-back, content lower-left */
 .m2 .bigYear { left: 50%; top: 7vh; transform-origin: top center; margin-left: -15vw; }
@@ -157,6 +157,18 @@
 /* 2026 — calm, confident: year right-centre, content left-centre */
 .m5 .bigYear { right: -3vw; top: 50%; translate: 0 -50%; }
 .m5 .content { left: 8vw; top: 50%; translate: 0 -50%; }
+
+/* 2017 — year slightly right of centre, copy upper-left */
+.m6 .bigYear { left: 42vw; top: 10vh; }
+.m6 .content { left: 7vw; top: 13vh; }
+
+/* 2021 — year in the lower background, copy upper-right */
+.m7 .bigYear { left: 50%; bottom: 3vh; translate: -50% 0; }
+.m7 .content { right: 7vw; top: 13vh; }
+
+/* 2025 — year extending past the right edge, copy left, upper */
+.m8 .bigYear { right: -9vw; top: 16vh; }
+.m8 .content { left: 7vw; top: 15vh; }
 
 /* ── Closing ─────────────────────────────────────────────── */
 .closing {
@@ -202,13 +214,8 @@
   .titleMain {
     font-size: clamp(28px, 8.6vw, 38px);
   }
-  /* One coherent mobile scheme: year upper, content lower half */
-  .m0 .bigYear,
-  .m1 .bigYear,
-  .m2 .bigYear,
-  .m3 .bigYear,
-  .m4 .bigYear,
-  .m5 .bigYear {
+  /* One coherent mobile scheme (all variants): year upper, content lower */
+  .milestone .bigYear {
     left: 4vw;
     right: auto;
     top: 9vh;
@@ -217,12 +224,7 @@
     translate: none;
     font-size: clamp(120px, 34vw, 160px);
   }
-  .m0 .content,
-  .m1 .content,
-  .m2 .content,
-  .m3 .content,
-  .m4 .content,
-  .m5 .content {
+  .milestone .content {
     left: 22px;
     right: 22px;
     top: auto;

@@ -24,13 +24,18 @@ interface TimelineVisualProps {
   isMobile: boolean
 }
 
-/** Per-period particle palettes along the path (u-segment → colours). */
+/** Per-period particle palettes along the path (u-segment → colours).
+    One coherent journey: champagne → coral → violet → ice → blends →
+    partial iridescence → the full combination at 2026. */
 const SEGMENT_PALETTES: string[][] = [
   [TL_WHITE, TL_CHAMPAGNE],
+  [TL_CHAMPAGNE, TL_WHITE, TL_CORAL],
   [TL_CORAL, TL_WHITE],
   [TL_VIOLET, TL_WHITE],
+  [TL_VIOLET, TL_ICE],
   [TL_ICE, TL_WHITE],
   [TL_CORAL, TL_VIOLET],
+  [TL_CORAL, TL_VIOLET, TL_ICE],
   [TL_CORAL, TL_VIOLET, TL_ICE, TL_CHAMPAGNE],
 ]
 
@@ -64,7 +69,7 @@ function gauss(): number {
 
 function segmentColor(u: number): THREE.Color {
   const soft = Math.floor(
-    Math.min(5.999, Math.max(0, u * 6 + (Math.random() - 0.5) * 0.7)),
+    Math.min(8.999, Math.max(0, u * 9 + (Math.random() - 0.5) * 0.7)),
   )
   const palette = SEGMENT_PALETTES[soft]
   const c = new THREE.Color(palette[(Math.random() * palette.length) | 0])
