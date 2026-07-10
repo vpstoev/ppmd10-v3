@@ -11,16 +11,10 @@ import './index.css'
 //
 // The original site shell also remains available:
 //   import App from './App.tsx'
-import HgInspiredHero from './HgInspiredHero.tsx'
-import WhatPpmdMakesPossible from './WhatPpmdMakesPossible.tsx'
-import TenYearsInMotion from './TenYearsInMotion.tsx'
-import ProjectsThatShapedTheDecade from './ProjectsThatShapedTheDecade.tsx'
+import ExperiencePage from './ExperiencePage.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <HgInspiredHero />
-    <WhatPpmdMakesPossible />
-    <TenYearsInMotion />
-    <ProjectsThatShapedTheDecade />
+    <ExperiencePage />
   </StrictMode>,
 )

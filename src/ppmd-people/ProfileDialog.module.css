@@ -1,0 +1,219 @@
+/* Shared editorial profile dialog — one implementation for leadership
+   and employees. Large 4:5 portrait column + scrollable content column. */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right))
+    max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+  background: rgba(4, 4, 8, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  pointer-events: auto;
+}
+
+.panel {
+  position: relative;
+  display: grid;
+  grid-template-columns: 41% 59%;
+  width: min(1180px, calc(100vw - 64px));
+  height: min(820px, calc(100vh - 64px));
+  min-height: min(620px, calc(100vh - 64px));
+  overflow: hidden;
+  background: linear-gradient(165deg, #101019 0%, #0a0a11 100%);
+  border: 1px solid rgba(245, 239, 228, 0.12);
+  border-top: 3px solid;
+  border-radius: 18px;
+  color: #f5efe4;
+  font-family: 'Geist Variable', 'Geist', system-ui, sans-serif;
+}
+
+/* Leadership: slightly stronger portrait presence, same structure */
+.panelLead {
+  grid-template-columns: 44% 56%;
+}
+
+.close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 5;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(245, 239, 228, 0.25);
+  border-radius: 50%;
+  background: rgba(8, 8, 14, 0.72);
+  color: #f5efe4;
+  font-size: 21px;
+  line-height: 1;
+}
+.close:hover {
+  background: rgba(245, 239, 228, 0.12);
+}
+.close:focus-visible {
+  outline: 2px solid #ff6e79;
+  outline-offset: 2px;
+}
+
+/* ── Portrait column (fixed inside the dialog) ───────────── */
+.portraitCol {
+  position: relative;
+  min-height: 0;
+  background: #0b0b13;
+  border-right: 1px solid rgba(245, 239, 228, 0.08);
+}
+
+.photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* vertical rectangular portrait — never a circle */
+}
+
+.wash {
+  position: absolute;
+  inset: 0;
+}
+
+.monogram {
+  position: absolute;
+  left: 24px;
+  bottom: 20px;
+  font-size: clamp(28px, 4vh, 38px);
+  font-weight: 720;
+  letter-spacing: 0.06em;
+  opacity: 0.85;
+}
+
+/* ── Content column (scrolls when needed) ────────────────── */
+.contentCol {
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 2vh, 20px);
+  padding: clamp(28px, 5vh, 52px) clamp(26px, 3.4vw, 56px) clamp(28px, 5vh, 48px)
+    clamp(24px, 3vw, 48px);
+}
+
+.label {
+  font-size: clamp(11px, 1.6vh, 13px);
+  font-weight: 660;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+
+.name {
+  margin: 0;
+  font-family: inherit;
+  font-size: clamp(28px, 4.6vh, 46px);
+  font-weight: 720;
+  letter-spacing: -0.022em;
+  line-height: 1.05;
+  color: #f5efe4;
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.role {
+  font-size: clamp(15px, 2.2vh, 18px);
+  font-weight: 600;
+  color: rgba(245, 239, 228, 0.85);
+}
+
+.unit {
+  font-size: clamp(11px, 1.6vh, 13px);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(245, 239, 228, 0.55);
+}
+
+.quote {
+  margin: clamp(6px, 1.4vh, 14px) 0 0;
+  font-size: clamp(19px, 2.8vh, 26px);
+  font-weight: 620;
+  font-variation-settings: 'wght' 620;
+  line-height: 1.35;
+  letter-spacing: -0.015em;
+  color: #f5efe4;
+  text-wrap: balance;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: clamp(4px, 1vh, 10px);
+}
+
+.sectionLabel {
+  font-size: 10.5px;
+  font-weight: 660;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: rgba(245, 239, 228, 0.5);
+}
+
+.sectionText {
+  font-size: clamp(14.5px, 2vh, 16.5px);
+  line-height: 1.6;
+  color: rgba(245, 239, 228, 0.84);
+  max-width: 58ch;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ── Mobile: near-fullscreen, one column, portrait first ─── */
+@media (max-width: 700px) {
+  .backdrop {
+    padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right))
+      max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  }
+  .panel,
+  .panelLead {
+    display: flex;
+    flex-direction: column;
+    width: calc(100vw - 24px);
+    height: auto;
+    min-height: 0;
+    max-height: calc(100svh - 24px);
+  }
+  .portraitCol {
+    flex: none;
+    height: min(44svh, 420px);
+    border-right: none;
+    border-bottom: 1px solid rgba(245, 239, 228, 0.08);
+  }
+  .contentCol {
+    flex: 1;
+    overflow-y: auto;
+    padding: 22px 20px 26px;
+  }
+  .name {
+    font-size: clamp(24px, 6.6vw, 30px);
+  }
+  .quote {
+    font-size: clamp(17px, 5vw, 21px);
+  }
+}

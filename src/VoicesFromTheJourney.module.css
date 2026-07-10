@@ -1,0 +1,195 @@
+/* Voices — one quote at a time, calm space, CSS-only particle traces. */
+
+.container {
+  position: relative;
+  background: #07070c;
+  font-family: 'Geist Variable', 'Geist', system-ui, sans-serif;
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+
+/* ── Decorative traces (no WebGL) ────────────────────────── */
+.traces {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.streak {
+  position: absolute;
+  height: clamp(10px, 2vh, 18px);
+  border-radius: 999px;
+  filter: blur(16px);
+  opacity: 0.22;
+  animation: streakDrift 14s ease-in-out infinite;
+}
+.streakA {
+  left: -6%;
+  top: 24%;
+  width: 46%;
+  background: linear-gradient(90deg, transparent, #ff6e79, #9d6bff, transparent);
+  transform: rotate(-7deg);
+}
+.streakB {
+  right: -8%;
+  top: 58%;
+  width: 52%;
+  background: linear-gradient(90deg, transparent, #7cc4ff, #e8c188, transparent);
+  transform: rotate(5deg);
+  animation-delay: -5s;
+}
+.streakC {
+  left: 18%;
+  bottom: 12%;
+  width: 38%;
+  background: linear-gradient(90deg, transparent, #9d6bff, #7cc4ff, transparent);
+  transform: rotate(-3deg);
+  animation-delay: -9s;
+}
+
+@keyframes streakDrift {
+  0%,
+  100% {
+    translate: 0 0;
+    opacity: 0.16;
+  }
+  50% {
+    translate: 3% -2%;
+    opacity: 0.28;
+  }
+}
+
+.dot {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  opacity: 0.5;
+  animation: dotFloat 9s ease-in-out infinite;
+}
+.dotA { left: 16%; top: 30%; background: #ff6e79; }
+.dotB { right: 20%; top: 22%; background: #7cc4ff; animation-delay: -3s; }
+.dotC { left: 28%; bottom: 24%; background: #e8c188; animation-delay: -6s; }
+.dotD { right: 30%; bottom: 32%; background: #9d6bff; animation-delay: -1.5s; }
+
+@keyframes dotFloat {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 8px -14px;
+  }
+}
+
+/* ── Text ────────────────────────────────────────────────── */
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.title {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 22px;
+}
+
+.titleMain {
+  margin: 0;
+  font-family: inherit;
+  font-size: clamp(32px, 4.4vw, 80px);
+  font-weight: 720;
+  font-variation-settings: 'wght' 720;
+  line-height: 1.02;
+  letter-spacing: -0.028em;
+  color: #f5efe4;
+}
+.titleLine {
+  display: block;
+  white-space: nowrap;
+}
+
+.quoteBlock {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(22px, 4vh, 40px);
+  text-align: center;
+  padding: 0 clamp(24px, 9vw, 180px);
+}
+
+.quoteMask {
+  overflow: hidden;
+}
+
+.quote {
+  margin: 0;
+  max-width: 26ch;
+  font-family: inherit;
+  font-size: clamp(26px, 2.4vw + 1.6vh, 54px);
+  font-weight: 640;
+  font-variation-settings: 'wght' 640;
+  line-height: 1.22;
+  letter-spacing: -0.022em;
+  color: #f5efe4;
+  text-wrap: balance;
+}
+
+.attribution {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.attributionRule {
+  width: 42px;
+  height: 2px;
+  border-radius: 2px;
+}
+
+.attributionName {
+  font-size: clamp(13px, 1.9vh, 16px);
+  font-weight: 640;
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+  text-transform: uppercase;
+  color: #f5efe4;
+}
+
+.attributionRole {
+  font-size: clamp(11.5px, 1.65vh, 13.5px);
+  letter-spacing: 0.16em;
+  text-indent: 0.16em;
+  text-transform: uppercase;
+  color: rgba(245, 239, 228, 0.55);
+}
+
+/* ── Mobile ──────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .titleMain {
+    font-size: clamp(28px, 8.4vw, 36px);
+  }
+  .titleLine {
+    white-space: normal;
+  }
+  .quote {
+    font-size: clamp(20px, 5.8vw, 26px);
+    max-width: 100%;
+  }
+}

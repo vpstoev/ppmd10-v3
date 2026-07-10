@@ -1,0 +1,165 @@
+/* Final closing — calm iridescent horizon, minimal identity, one line. */
+
+.container {
+  position: relative;
+  background: #07070c;
+  font-family: 'Geist Variable', 'Geist', system-ui, sans-serif;
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+
+/* ── Horizon scene ───────────────────────────────────────── */
+.scene {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.strands {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.horizonLine {
+  position: absolute;
+  left: 6vw;
+  right: 6vw;
+  top: 56%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ff6e79 18%, #9d6bff 42%, #7cc4ff 64%, #e8c188 86%, transparent);
+  border-radius: 2px;
+}
+
+.horizonGlow {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 56%;
+  height: 1px;
+  box-shadow: 0 0 90px 34px rgba(157, 107, 255, 0.18), 0 0 140px 60px rgba(255, 110, 121, 0.1);
+  animation: horizonBreathe 8s ease-in-out infinite;
+}
+
+@keyframes horizonBreathe {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ── Text ────────────────────────────────────────────────── */
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.block {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 22px;
+}
+
+.statement {
+  margin: 0;
+  font-family: inherit;
+  font-size: clamp(34px, 4.8vw, 88px);
+  font-weight: 730;
+  font-variation-settings: 'wght' 730;
+  line-height: 1.02;
+  letter-spacing: -0.028em;
+  color: #f5efe4;
+  text-shadow: 0 2px 26px rgba(4, 4, 8, 0.8);
+}
+.line {
+  display: block;
+  white-space: nowrap;
+}
+.lineGradient {
+  background: linear-gradient(90deg, #ff6e79 0%, #9d6bff 36%, #7cc4ff 68%, #e8c188 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+}
+
+.identity {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 9vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  padding: 0 22px;
+}
+
+.identityName {
+  font-size: clamp(20px, 3vh, 27px);
+  font-weight: 720;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+  color: #f5efe4;
+}
+
+.identityDept {
+  font-size: clamp(11.5px, 1.7vh, 14px);
+  letter-spacing: 0.18em;
+  text-indent: 0.18em;
+  text-transform: uppercase;
+  color: rgba(245, 239, 228, 0.62);
+}
+
+.identityMeta {
+  font-size: clamp(11px, 1.6vh, 13px);
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-indent: 0.3em;
+  color: #e8c188;
+}
+
+/* ── Footer line ─────────────────────────────────────────── */
+.footer {
+  background: #050508;
+  padding: 26px 22px;
+  text-align: center;
+}
+.footer p {
+  font-family: 'Geist Variable', 'Geist', system-ui, sans-serif;
+  font-size: 11.5px;
+  font-weight: 560;
+  letter-spacing: 0.28em;
+  text-indent: 0.28em;
+  text-transform: uppercase;
+  color: rgba(245, 239, 228, 0.5);
+}
+
+/* ── Mobile ──────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .statement {
+    font-size: clamp(28px, 8.2vw, 36px);
+  }
+  .line {
+    white-space: normal;
+  }
+  .identityDept {
+    max-width: 32ch;
+  }
+}

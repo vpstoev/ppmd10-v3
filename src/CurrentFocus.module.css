@@ -1,0 +1,207 @@
+/* Current Focus — one evolving spatial system, five temporary states. */
+
+.container {
+  position: relative;
+  background: #07070c;
+  font-family: 'Geist Variable', 'Geist', system-ui, sans-serif;
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+
+.canvasLayer {
+  position: absolute;
+  inset: 0;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ── Title ───────────────────────────────────────────────── */
+.title {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(14px, 2.6vh, 24px);
+  text-align: center;
+  padding: 0 22px;
+}
+
+.titleLabel {
+  font-size: clamp(11px, 1.6vh, 13.5px);
+  font-weight: 640;
+  letter-spacing: 0.34em;
+  text-indent: 0.34em;
+  text-transform: uppercase;
+  color: #e8c188;
+}
+
+.titleMain {
+  margin: 0;
+  font-family: inherit;
+  font-size: clamp(32px, 4.4vw, 80px);
+  font-weight: 720;
+  font-variation-settings: 'wght' 720;
+  line-height: 1.02;
+  letter-spacing: -0.028em;
+  color: #f5efe4;
+  text-shadow: 0 2px 26px rgba(4, 4, 8, 0.8);
+}
+.titleLine {
+  display: block;
+  white-space: nowrap;
+}
+
+/* ── Focus states ────────────────────────────────────────── */
+.focusBlock {
+  position: absolute;
+  inset: 0;
+}
+
+.focusNum {
+  position: absolute;
+  right: -3vw;
+  top: 14vh;
+  font-size: clamp(180px, 30vw, 500px);
+  font-weight: 760;
+  line-height: 0.8;
+  letter-spacing: -0.05em;
+  user-select: none;
+}
+.focusRight .focusNum {
+  right: auto;
+  left: -3vw;
+}
+
+.focusContent {
+  position: absolute;
+  left: clamp(24px, 7vw, 130px);
+  top: 50%;
+  translate: 0 -50%;
+  max-width: min(50vw, 640px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 2vh, 18px);
+  text-shadow: 0 2px 22px rgba(4, 4, 8, 0.78);
+}
+.focusRight .focusContent {
+  left: auto;
+  right: clamp(24px, 7vw, 130px);
+}
+
+.focusMeta {
+  font-size: clamp(14px, 2.1vh, 18px);
+  font-weight: 720;
+  letter-spacing: 0.1em;
+}
+
+.focusName {
+  margin: 0;
+  max-width: 13ch;
+  font-family: inherit;
+  font-size: clamp(34px, 4.2vw, 74px);
+  font-weight: 720;
+  font-variation-settings: 'wght' 720;
+  line-height: 0.98;
+  letter-spacing: -0.028em;
+  color: #f5efe4;
+  text-wrap: balance;
+}
+
+.focusLine {
+  max-width: 40ch;
+  font-size: clamp(15px, 2.1vh, 18px);
+  line-height: 1.6;
+  color: rgba(245, 239, 228, 0.78);
+}
+
+/* ── Closing ─────────────────────────────────────────────── */
+.closing {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 22px;
+}
+
+.closingMain {
+  margin: 0;
+  font-family: inherit;
+  font-size: clamp(32px, 4.8vw, 88px);
+  font-weight: 730;
+  font-variation-settings: 'wght' 730;
+  line-height: 1.02;
+  letter-spacing: -0.028em;
+  color: #f5efe4;
+  text-shadow: 0 2px 26px rgba(4, 4, 8, 0.8);
+}
+
+/* ── Mobile ──────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .titleMain {
+    font-size: clamp(26px, 8vw, 34px);
+  }
+  .titleLine {
+    white-space: normal;
+  }
+  .focusNum,
+  .focusRight .focusNum {
+    left: auto;
+    right: 4vw;
+    top: 7vh;
+    font-size: clamp(110px, 30vw, 150px);
+  }
+  .focusContent,
+  .focusRight .focusContent {
+    left: 22px;
+    right: 22px;
+    top: auto;
+    bottom: 10vh;
+    translate: none;
+    max-width: 100%;
+  }
+  .focusName {
+    font-size: clamp(28px, 8vw, 34px);
+    max-width: 100%;
+  }
+  .focusLine {
+    font-size: 15px;
+  }
+  .closingMain {
+    font-size: clamp(28px, 8vw, 36px);
+  }
+}
+
+/* ── No-WebGL fallback ───────────────────────────────────── */
+.fallback {
+  background: #07070c;
+  font-family: 'Geist Variable', 'Geist', system-ui, sans-serif;
+}
+
+.fbBlock {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(10px, 2vh, 18px);
+  padding: 12vh clamp(24px, 8vw, 150px);
+}
+
+.fbCenter {
+  align-items: center;
+  text-align: center;
+}
