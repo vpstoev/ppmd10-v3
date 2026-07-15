@@ -5,9 +5,9 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 // Command-aware base: dev serves from "/" (http://localhost:5173/),
-// production builds target GitHub Pages at /ppmd10/.
+// production builds target GitHub Pages at /ppmd10-v3/.
 export default defineConfig(({ command }) => ({
-  base: command === 'build' ? '/ppmd10/' : '/',
+  base: command === 'build' ? '/ppmd10-v3/' : '/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
