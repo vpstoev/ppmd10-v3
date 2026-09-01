@@ -41,7 +41,7 @@ const SCENES: Record<
   'senior-director': {
     level: 'area',
     sceneKicker: 'Area Vision',
-    photo: 'elitsa-shopova-final.png',
+    photo: 'Elitsa-Shopova_Senior-Director.jpg',
     photoPosition: '52% 28%',
     accent: '#e8c188' /* champagne — senior, calm */,
   },

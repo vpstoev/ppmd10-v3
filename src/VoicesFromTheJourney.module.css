@@ -1516,7 +1516,7 @@
 
 .spot[data-effect='celestial'] .solarStage {
   --body-width: clamp(1680px, 185vw, 5200px);
-  --body-right: -86%;
+  --body-right: -74%;
   --body-bottom: -42%;
   width: 100%;
   height: 100%;
@@ -1531,7 +1531,7 @@
 
 .spot[data-effect='celestial'] .solarStage[data-body='saturn'] {
   --body-width: clamp(1500px, 170vw, 4800px);
-  --body-right: -80%;
+  --body-right: -68%;
   --body-bottom: -38%;
 }
 
@@ -1745,7 +1745,7 @@
 
   .spot[data-effect='celestial'] .solarStage {
     --body-width: clamp(860px, 225vw, 1160px);
-    --body-right: -92%;
+    --body-right: -82%;
     --body-bottom: -13%;
     min-height: 100svh;
     height: auto;
@@ -1758,7 +1758,7 @@
 
   .spot[data-effect='celestial'] .solarStage[data-body='saturn'] {
     --body-width: clamp(780px, 205vw, 1020px);
-    --body-right: -80%;
+    --body-right: -72%;
     --body-bottom: -8%;
   }
 
