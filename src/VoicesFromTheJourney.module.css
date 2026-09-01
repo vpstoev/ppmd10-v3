@@ -1,195 +1,1812 @@
-/* Voices — one quote at a time, calm space, CSS-only particle traces. */
+/* Voices — kinetic editorial chorus.
+
+   Every phase lives in the same pinned stage and is positioned
+   absolutely over it, so switching between them is opacity and
+   transform rather than layout. Nothing here reflows while the timeline
+   is scrubbed.
+
+   There are no cards, no pills, no badges, no bordered components, no
+   counters and no progress bar in this file. */
 
 .container {
   position: relative;
-  background: #07070c;
+  background: #0b0a09;
   font-family: 'Geist Variable', 'Geist', system-ui, sans-serif;
+  color: #f0eae0;
+  overflow: clip;
 }
 
-.sticky {
+.stage {
   position: sticky;
   top: 0;
   height: 100svh;
+  /* The masked edge: everything that leaves does so through the frame,
+     and nothing is ever caught half outside it. */
+  overflow: clip;
+  --padX: clamp(26px, 4vw, 92px);
+  --padY: clamp(22px, 4vh, 60px);
+}
+
+.ground {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(92% 68% at 50% 46%, rgba(77, 54, 99, 0.32) 0%, rgba(30, 24, 27, 0.82) 38%, #0b0a09 76%),
+    radial-gradient(62% 46% at 26% 68%, rgba(232, 193, 136, 0.09), transparent 72%),
+    linear-gradient(180deg, #07070c 0%, transparent 10% 90%, #07070c 100%);
+}
+
+/* ── The oversized word ────────────────────────────────────
+   Deliberately larger than the frame: it is cropped left and right by
+   the stage, which is what stops it reading as a centred logotype. */
+.display {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: 0;
+  translate: -50% -50%;
+  font-size: 30vw;
+  font-weight: 700;
+  line-height: 0.78;
+  letter-spacing: -0.055em;
+  white-space: nowrap;
+  color: #ffffff;
+  opacity: 0.055;
+  z-index: 3;
+  /* Faded at top and bottom so it sits under the chorus rather than
+     behind a hard edge. */
+  mask-image: linear-gradient(180deg, transparent 2%, #000 26%, #000 74%, transparent 98%);
+}
+
+/* ── The chorus ────────────────────────────────────────────── */
+
+/* Dimming while a testimonial is open. Kept out of the scroll transform
+   so it can change with state rather than being frozen into it. */
+.chorusDim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+.chorusDim[data-dim] {
+  opacity: 0.14;
+}
+
+.chorus {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.plane {
+  position: absolute;
+  inset: 0;
+  will-change: transform, filter;
+}
+
+/**
+ * One piece of type.
+ *
+ * The idle breath is here rather than on the timeline: a slow, tiny
+ * oscillation with a per-item duration and a negative delay, so the
+ * chorus is never still and never in step with itself. It is two
+ * transforms on a text node — no layout, no paint beyond the glyphs.
+ */
+.piece {
+  position: absolute;
+  white-space: nowrap;
+  translate: -50% -50%;
+  animation: vBreath var(--breath, 20s) ease-in-out var(--delay, 0s) infinite;
+}
+
+@keyframes vBreath {
+  0%,
+  100% {
+    transform: translate3d(-0.22vw, 0.16vh, 0);
+  }
+  50% {
+    transform: translate3d(0.35vw, -0.3vh, 0);
+  }
+}
+
+.scrollCue {
+  position: absolute;
+  left: var(--padX);
+  bottom: var(--padY);
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: rgba(245, 239, 228, 0.7);
+  font-size: clamp(9px, 0.62vw, 11px);
+  font-weight: 620;
+  letter-spacing: 0.2em;
+  line-height: 1;
+  text-transform: uppercase;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.scrollCue[data-hidden] {
+  opacity: 0 !important;
+}
+
+.scrollCue i {
+  position: relative;
+  display: block;
+  width: 42px;
+  height: 1px;
   overflow: hidden;
+  background: rgba(245, 239, 228, 0.2);
 }
 
-/* ── Decorative traces (no WebGL) ────────────────────────── */
-.traces {
+.scrollCue i::after {
+  content: '';
   position: absolute;
   inset: 0;
+  background: linear-gradient(90deg, transparent, #e8c188, transparent);
+  animation: scrollCueTravel 1.8s ease-in-out infinite;
+}
+
+@keyframes scrollCueTravel {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+
+.pieceName {
+  font-weight: 560;
+  letter-spacing: -0.014em;
+  color: #f4efe6;
+}
+
+.piecePhrase {
+  font-weight: 380;
+  font-style: italic;
+  letter-spacing: -0.004em;
+  color: color-mix(in srgb, var(--tint) 52%, #efe7da);
+}
+
+/* ── Words that assemble ───────────────────────────────────
+   The statement and the closing line share one treatment: tokens fly in
+   from where the chorus was and settle into a line. */
+.statement,
+.closing {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: 0;
+  translate: -50% -50%;
+  width: min(92%, 1500px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  z-index: 7;
+  pointer-events: none;
+  font-weight: 660;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  color: #fdfaf4;
+}
+
+.statement {
+  font-size: clamp(38px, 6.4vw, 116px);
+  gap: 0.04em;
+}
+
+.closing {
+  font-size: clamp(34px, 5.6vw, 104px);
+  gap: 0.02em;
+}
+
+.assemblyLine {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  gap: 0.28em;
+}
+
+.token {
+  display: inline-block;
+  will-change: transform, filter;
+}
+
+/* ── The author field ──────────────────────────────────────
+   Twenty names on the open stage. Each is a real button; the visible
+   treatment is type and colour only — no box is drawn around any of
+   them at any point. */
+.field {
+  position: absolute;
+  inset: var(--padY) var(--padX);
+  z-index: 6;
+  isolation: isolate;
+}
+
+.field:not([data-interactive]) {
   pointer-events: none;
 }
 
-.streak {
+.fieldInstruction {
   position: absolute;
-  height: clamp(10px, 2vh, 18px);
-  border-radius: 999px;
-  filter: blur(16px);
-  opacity: 0.22;
-  animation: streakDrift 14s ease-in-out infinite;
-}
-.streakA {
-  left: -6%;
-  top: 24%;
-  width: 46%;
-  background: linear-gradient(90deg, transparent, #ff6e79, #9d6bff, transparent);
-  transform: rotate(-7deg);
-}
-.streakB {
-  right: -8%;
-  top: 58%;
-  width: 52%;
-  background: linear-gradient(90deg, transparent, #7cc4ff, #e8c188, transparent);
-  transform: rotate(5deg);
-  animation-delay: -5s;
-}
-.streakC {
-  left: 18%;
-  bottom: 12%;
-  width: 38%;
-  background: linear-gradient(90deg, transparent, #9d6bff, #7cc4ff, transparent);
-  transform: rotate(-3deg);
-  animation-delay: -9s;
+  left: 0;
+  top: 0;
+  z-index: 4;
+  margin: 0;
+  color: rgba(245, 239, 228, 0.58);
+  font-size: clamp(9px, 0.62vw, 11px);
+  font-weight: 620;
+  letter-spacing: 0.22em;
+  line-height: 1;
+  text-transform: uppercase;
+  pointer-events: none;
 }
 
-@keyframes streakDrift {
-  0%,
-  100% {
-    translate: 0 0;
-    opacity: 0.16;
-  }
-  50% {
-    translate: 3% -2%;
-    opacity: 0.28;
-  }
-}
-
-.dot {
+/* The overview now has a slow visual pulse of its own. It is deliberately
+   an atmosphere rather than another card or pill: the names remain the
+   interface, while the rings, scan and central glow make the whole field
+   feel alive before a pointer reaches any name. */
+.fieldAtmosphere {
   position: absolute;
-  width: 4px;
-  height: 4px;
+  inset: 2% 5%;
+  z-index: 0;
+  overflow: hidden;
   border-radius: 50%;
-  opacity: 0.5;
-  animation: dotFloat 9s ease-in-out infinite;
-}
-.dotA { left: 16%; top: 30%; background: #ff6e79; }
-.dotB { right: 20%; top: 22%; background: #7cc4ff; animation-delay: -3s; }
-.dotC { left: 28%; bottom: 24%; background: #e8c188; animation-delay: -6s; }
-.dotD { right: 30%; bottom: 32%; background: #9d6bff; animation-delay: -1.5s; }
-
-@keyframes dotFloat {
-  0%,
-  100% {
-    translate: 0 0;
-  }
-  50% {
-    translate: 8px -14px;
-  }
-}
-
-/* ── Text ────────────────────────────────────────────────── */
-.overlay {
-  position: absolute;
-  inset: 0;
   pointer-events: none;
-  z-index: 2;
+  opacity: 0.92;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255, 248, 231, 0.085), transparent 30%),
+    radial-gradient(circle at 70% 42%, rgba(157, 107, 255, 0.15), transparent 34%),
+    radial-gradient(circle at 31% 65%, rgba(232, 193, 136, 0.1), transparent 34%);
+  animation: fieldAtmosphereBreath 11s ease-in-out infinite;
 }
 
-.title {
+.fieldOrbit {
   position: absolute;
-  inset: 0;
+  display: block;
+  border: 1.5px solid rgba(157, 107, 255, 0.34);
+  border-radius: 50%;
+  transform-origin: 50% 50%;
+  box-shadow: 0 0 22px rgba(157, 107, 255, 0.08);
+  will-change: transform;
+}
+
+.fieldOrbitA {
+  width: 74%;
+  height: 120%;
+  left: 13%;
+  top: -10%;
+  opacity: 0.52;
+  animation: fieldOrbit 30s linear infinite;
+}
+
+.fieldOrbitB {
+  width: 54%;
+  height: 58%;
+  left: 24%;
+  top: 21%;
+  border-color: rgba(232, 193, 136, 0.2);
+  opacity: 0.62;
+  transform: rotate(-21deg);
+  animation: fieldOrbitReverse 23s linear infinite;
+}
+
+.fieldPulse {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 42%;
+  height: 74%;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(157, 107, 255, 0.12), rgba(157, 107, 255, 0.025) 43%, transparent 74%);
+  filter: blur(14px);
+  opacity: 0.55;
+  animation: fieldPulse 8s ease-in-out infinite;
+}
+
+.fieldScan {
+  position: absolute;
+  left: -16%;
+  top: 51%;
+  width: 132%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 248, 231, 0.22) 50%, transparent);
+  box-shadow: 0 0 18px rgba(157, 107, 255, 0.2);
+  opacity: 0.28;
+  animation: fieldScan 8.5s ease-in-out infinite;
+}
+
+.fieldSeat {
+  z-index: 1;
+}
+
+@keyframes fieldAtmosphereBreath {
+  0%,
+  100% { transform: scale(0.985); opacity: 0.52; }
+  50% { transform: scale(1.015); opacity: 0.78; }
+}
+
+@keyframes fieldOrbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fieldOrbitReverse {
+  from { transform: rotate(-21deg); }
+  to { transform: rotate(-381deg); }
+}
+
+@keyframes fieldPulse {
+  0%,
+  100% { transform: scale(0.94); opacity: 0.34; }
+  50% { transform: scale(1.06); opacity: 0.66; }
+}
+
+@keyframes fieldScan {
+  0%,
+  100% { transform: translateX(-4%); opacity: 0.12; }
+  50% { transform: translateX(4%); opacity: 0.42; }
+}
+
+.fieldSeat {
+  position: absolute;
+  display: block;
+  margin: 0;
+  padding: 6px 10px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  translate: -50% -50%;
+  /* The shove from a neighbour, the depth step, and the idle breath —
+     one transform, so they compose instead of fighting. */
+  transform: translate(var(--dx, 0), var(--dy, 0)) scale(var(--sc, 1));
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.45s ease,
+    filter 0.45s ease;
+  animation: none;
+  isolation: isolate;
+}
+
+/* A single travelling highlight marks the item being considered. The
+   trace completes once; it does not loop like a decorative neon sign. */
+.fieldSeat::before {
+  content: '';
+  position: absolute;
+  inset: -9px -12px;
+  z-index: -1;
+  border-radius: 999px;
+  padding: 2px;
+  opacity: 0;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 250deg,
+    color-mix(in srgb, var(--tint) 70%, #fff) 286deg,
+    #fff8e7 310deg,
+    transparent 340deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  filter: drop-shadow(0 0 7px color-mix(in srgb, var(--tint) 54%, transparent));
+  animation: vAmbientTrace 10s ease-in-out var(--trace-delay, 0s) infinite;
+}
+
+@keyframes vAmbientTrace {
+  0%, 2% { opacity: 0; transform: scale(.97); }
+  6% { opacity: .82; }
+  16% { opacity: .58; transform: scale(1.025); }
+  22%, 100% { opacity: 0; transform: scale(1.05); }
+}
+
+.seatName {
+  display: block;
+  font-size: clamp(15px, 1.02vw, 21px);
+  font-weight: 540;
+  letter-spacing: -0.016em;
+  line-height: 1.1;
+  color: rgba(248, 243, 235, 0.91);
+  text-shadow: 0 0 18px color-mix(in srgb, var(--tint) 13%, transparent);
+  transition: color 0.35s ease;
+}
+
+.seatRole {
+  display: block;
+  margin-top: 4px;
+  font-size: clamp(9px, 0.54vw, 11px);
+  font-weight: 430;
+  line-height: 1.15;
+  letter-spacing: 0.035em;
+  color: rgba(240, 234, 224, 0.62);
+  transition: color 0.35s ease;
+}
+
+/* The fragment only exists while its name is being looked at. It is
+   reserved no space, so nothing around it moves when it appears. */
+.seatPhrase {
+  position: absolute;
+  left: 10px;
+  top: 100%;
+  margin-top: 4px;
+  font-size: clamp(11px, 0.66vw, 13px);
+  font-weight: 380;
+  font-style: italic;
+  letter-spacing: -0.002em;
+  color: var(--tint);
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.34s ease, transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.fieldSeat[data-spot] {
+  z-index: 3;
+}
+.fieldSeat[data-spot]::before,
+.fieldSeat:focus-visible::before {
+  animation: vTrace 1.15s cubic-bezier(0.3, 0.1, 0.2, 1) 1;
+}
+@keyframes vTrace {
+  0% {
+    opacity: 0;
+    transform: translateX(-8px) scale(0.96);
+  }
+  12% {
+    opacity: 0.9;
+  }
+  78% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(8px) scale(1.06);
+  }
+}
+.fieldSeat[data-spot] .seatName {
+  color: #fffdf8;
+}
+.fieldSeat[data-spot] .seatRole {
+  color: color-mix(in srgb, var(--tint) 66%, #f0eae0);
+}
+.fieldSeat[data-spot] .seatPhrase {
+  opacity: 1;
+  transform: translateY(0);
+}
+.fieldSeat:focus-visible {
+  outline: 1.5px solid rgba(253, 250, 244, 0.85);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* Once a testimonial is open the rest of the chorus is a trace at the
+   edge of the frame. */
+.fieldSeat[data-traced] {
+  opacity: 0.16;
+  filter: blur(1.6px);
+  animation: none;
+}
+.fieldSeat[data-selected][data-traced] {
+  opacity: 0;
+}
+
+/* ── One testimonial ───────────────────────────────────────
+   Asymmetric, full-bleed, set straight onto the stage. The name holds a
+   column at the left, the words run in a wider one that starts lower,
+   and the rule is the only mark. */
+.spot {
+  position: absolute;
+  inset: var(--padY) var(--padX);
+  z-index: 12;
+  display: grid;
+  grid-template-columns: 2px minmax(230px, 26%) minmax(0, 1fr);
+  grid-template-rows: 1fr auto;
+  column-gap: clamp(28px, 4.4vw, 96px);
+  align-content: center;
+  align-items: start;
+}
+
+.spotRule {
+  grid-column: 1;
+  grid-row: 1;
+  align-self: stretch;
+  background: linear-gradient(180deg, var(--accent) 0%, var(--accent) 58%, rgba(240, 234, 224, 0.07) 100%);
+}
+
+.spotWho {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
+}
+
+.spotName {
+  margin: 0;
+  font-size: clamp(30px, 3vw, 58px);
+  font-weight: 600;
+  line-height: 1.03;
+  letter-spacing: -0.032em;
+  color: var(--accent);
+}
+
+.spotRole {
+  margin: clamp(12px, 1.7vh, 22px) 0 0;
+  font-size: clamp(13px, 0.86vw, 16px);
+  font-weight: 520;
+  color: rgba(240, 234, 224, 0.92);
+}
+
+.spotUnit {
+  margin: 3px 0 0;
+  font-size: clamp(12px, 0.78vw, 14.5px);
+  font-weight: 420;
+  color: rgba(240, 234, 224, 0.58);
+}
+
+/* Themes as words in their own colours, parted by thin rules — no
+   containers, no fills. */
+.spotThemes {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  margin: clamp(14px, 2vh, 26px) 0 0;
+  font-size: clamp(10.5px, 0.62vw, 12px);
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+.spotThemes span {
+  padding-left: 12px;
+  border-left: 1px solid currentColor;
+  line-height: 1.5;
+}
+
+.quoteStage {
+  grid-column: 3;
+  grid-row: 1;
+  align-self: center;
+  position: relative;
+  padding-top: clamp(6px, 3.4vh, 46px);
+}
+
+.spotQuote {
+  position: relative;
+  z-index: 1;
+  font-weight: 400;
+  letter-spacing: -0.001em;
+  color: rgba(240, 234, 224, 0.84);
+  clip-path: inset(0 100% 0 0);
+  animation: vMaterialise 1.08s cubic-bezier(0.65, 0, 0.18, 1) 0.08s forwards;
+}
+
+/* The testimonial is not faded in. A vertical line crosses the text
+   plane and the words become visible immediately behind it. */
+.materialiser {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 3;
+  width: 1px;
+  opacity: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--accent) 42%, #fff) 14%,
+    #fff8e6 48%,
+    color-mix(in srgb, var(--accent) 72%, #fff) 78%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 8px color-mix(in srgb, var(--accent) 72%, transparent),
+    0 0 28px color-mix(in srgb, var(--accent) 42%, transparent);
+  animation: vScan 1.08s cubic-bezier(0.65, 0, 0.18, 1) 0.08s forwards;
+  pointer-events: none;
+}
+
+@keyframes vMaterialise {
+  0% {
+    clip-path: inset(0 100% 0 0);
+    filter: blur(4px);
+  }
+  18% {
+    filter: blur(1px);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    filter: blur(0);
+  }
+}
+
+@keyframes vScan {
+  0% {
+    left: 0;
+    opacity: 0;
+  }
+  8%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+
+/* The type steps with the length of the words, so a four-line
+   testimonial is set as a statement and a twenty-line one stays whole
+   on the same screen. Neither is ever cut. */
+.spot[data-size='short'] .spotQuote {
+  max-width: 22ch;
+  font-size: clamp(24px, 2.1vw, 40px);
+  line-height: 1.32;
+  font-weight: 380;
+  letter-spacing: -0.018em;
+}
+.spot[data-size='mid'] .spotQuote {
+  max-width: 40ch;
+  font-size: clamp(17px, 1.32vw, 25px);
+  line-height: 1.52;
+}
+.spot[data-size='long'] .spotQuote {
+  max-width: 58ch;
+  font-size: clamp(14.5px, 1.02vw, 19px);
+  line-height: 1.64;
+}
+
+.spotPara {
+  margin: 0;
+  /* The author's own line breaks, kept. */
+  white-space: pre-line;
+}
+.spotPara + .spotPara {
+  margin-top: 0.85em;
+}
+
+/**
+ * A lifted phrase.
+ *
+ * The author's own words, larger and at full strength. The run is a
+ * slice of the paragraph — remove the treatment and the paragraph reads
+ * back character for character.
+ */
+.spotLift {
+  display: inline;
+  font-size: 1.28em;
+  font-weight: 470;
+  line-height: 1.3;
+  letter-spacing: -0.014em;
+  color: #fffdf8;
+}
+.spot[data-size='short'] .spotLift {
+  font-size: 1.12em;
+  color: var(--accent);
+}
+
+/* ── Editorial controls ────────────────────────────────────
+   Words under a hairline. No buttons are drawn. */
+.spotNav {
+  grid-column: 1 / 4;
+  grid-row: 2;
   display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  padding: 0 22px;
+  justify-self: center;
+  gap: clamp(10px, 1.4vw, 22px);
+  margin-top: clamp(16px, 2.6vh, 34px);
+  padding: 9px 12px;
+  border: 1px solid rgba(240, 234, 224, 0.13);
+  border-radius: 999px;
+  background: rgba(11, 10, 9, 0.56);
+  box-shadow: 0 14px 48px rgba(0, 0, 0, 0.26), inset 0 1px rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(16px);
 }
 
-.titleMain {
-  margin: 0;
-  font-family: inherit;
-  font-size: clamp(32px, 4.4vw, 80px);
-  font-weight: 720;
-  font-variation-settings: 'wght' 720;
-  line-height: 1.02;
-  letter-spacing: -0.028em;
-  color: #f5efe4;
+.step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 34px;
+  padding: 0 9px;
+  border: 0;
+  background: none;
+  color: rgba(240, 234, 224, 0.6);
+  font: inherit;
+  font-size: clamp(11.5px, 0.68vw, 13px);
+  font-weight: 560;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.24s ease;
 }
-.titleLine {
+.step:hover {
+  color: #fffdf8;
+}
+.stepDirection span[aria-hidden='true'] {
+  font-size: 18px;
+  font-weight: 350;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+.stepAll {
+  color: color-mix(in srgb, var(--accent) 78%, #fff);
+}
+.voiceCount {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 4px;
+  color: rgba(240, 234, 224, 0.45);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+}
+.voiceCount strong {
+  color: #fffdf8;
+  font-size: 13px;
+  font-weight: 620;
+}
+.voiceCount i {
   display: block;
+  width: 20px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--accent), rgba(240, 234, 224, 0.16));
+}
+.step:focus-visible {
+  outline: 1.5px solid rgba(253, 250, 244, 0.85);
+  outline-offset: 4px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
   white-space: nowrap;
 }
 
-.quoteBlock {
-  position: absolute;
-  inset: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(22px, 4vh, 40px);
-  text-align: center;
-  padding: 0 clamp(24px, 9vw, 180px);
+/* ── Tablet ──────────────────────────────────────────────── */
+@media (max-width: 1280px) {
+  .spot {
+    grid-template-columns: 2px minmax(200px, 30%) minmax(0, 1fr);
+  }
+  .spot[data-size='long'] .spotQuote {
+    max-width: 50ch;
+  }
 }
 
-.quoteMask {
+@media (min-width: 900px) and (max-width: 1050px) {
+  .plane:nth-child(1) {
+    display: none;
+  }
+}
+
+/* ── Narrow ────────────────────────────────────────────────
+   A vertical sequence, in ordinary page flow. */
+.narrow {
+  height: auto !important;
+}
+
+.narrowInner {
+  position: relative;
+  z-index: 1;
+  padding: clamp(40px, 8vh, 76px) clamp(18px, 5vw, 40px) clamp(56px, 9vh, 96px);
+}
+
+.narrowDisplay {
+  margin: 0 0 clamp(24px, 5vh, 44px);
+  font-size: 26vw;
+  font-weight: 700;
+  line-height: 0.8;
+  letter-spacing: -0.055em;
+  color: #fff;
+  opacity: 0.07;
+}
+
+.narrowList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 2px;
+}
+
+.narrowSeat {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  padding: 11px 12px;
+  border: 0;
+  border-left: 2px solid var(--tint);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.narrowSeat::before {
+  content: '';
+  position: absolute;
+  inset: 2px 0;
+  z-index: -1;
+  padding: 1.5px;
+  border-radius: 12px;
+  opacity: 0;
+  background: conic-gradient(from 0deg, transparent 0 244deg, color-mix(in srgb, var(--tint) 82%, #fff) 278deg, #fff8e7 312deg, transparent 346deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  filter: drop-shadow(0 0 7px color-mix(in srgb, var(--tint) 55%, transparent));
+  animation: vAmbientTrace 10s ease-in-out var(--trace-delay, 0s) infinite;
+  pointer-events: none;
+}
+.narrowSeat[aria-current] {
+  background: rgba(240, 234, 224, 0.05);
+}
+.narrowSeat:focus-visible {
+  outline: 1.5px solid rgba(253, 250, 244, 0.85);
+  outline-offset: -2px;
+}
+.narrowName {
+  font-size: 16px;
+  font-weight: 560;
+  color: #fffaf2;
+}
+.narrowRole {
+  font-size: 11px;
+  font-weight: 430;
+  letter-spacing: 0.025em;
+  color: rgba(240, 234, 224, 0.68);
+}
+.narrowPhrase {
+  font-size: 12.5px;
+  font-style: italic;
+  font-weight: 380;
+  color: var(--tint);
+}
+
+.narrowStatement,
+.narrowClosing {
+  display: flex;
+  flex-direction: column;
+  margin: clamp(34px, 6vh, 60px) 0 0;
+  font-size: clamp(24px, 8.4vw, 40px);
+  font-weight: 660;
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  color: #fdfaf4;
+}
+.narrowClosing {
+  margin-top: clamp(44px, 8vh, 80px);
+}
+
+.narrowPiece {
+  margin-top: clamp(28px, 5vh, 48px);
+  scroll-margin-top: 12px;
+}
+
+/* In the vertical sequence the testimonial is ordinary flow, so it can
+   be as tall as it needs and the page simply gets longer. */
+.narrow .spot {
+  position: relative;
+  inset: auto;
+  display: grid;
+  grid-template-columns: 2px minmax(0, 1fr);
+  grid-template-rows: auto auto auto;
+  column-gap: 16px;
+  row-gap: clamp(18px, 3vh, 26px);
+}
+.narrow .spotRule {
+  grid-row: 1 / 4;
+}
+  .narrow .spotWho,
+  .narrow .quoteStage,
+  .narrow .spotNav {
+    grid-column: 2;
+  }
+.narrow .spotWho {
+  grid-row: 1;
+}
+  .narrow .quoteStage {
+    grid-row: 2;
+    padding-top: 0;
+  }
+  .narrow .spotQuote {
+    max-width: none !important;
+    font-size: 16px !important;
+    line-height: 1.62 !important;
+}
+.narrow .spotLift {
+  font-size: 1.18em;
+}
+  .narrow .spotNav {
+    grid-row: 3;
+    margin-top: 0;
+    width: 100%;
+    justify-content: space-between;
+    gap: 4px;
+    padding-inline: 8px;
+  }
+  .narrow .step {
+    padding-inline: 6px;
+    font-size: 10px;
+  }
+  .narrow .stepDirection span:not([aria-hidden='true']) {
+    display: none;
+  }
+  .narrow .voiceCount i {
+    width: 12px;
+  }
+
+/* ── Reduced motion ────────────────────────────────────────
+   The choreography becomes position and opacity: the chorus stops
+   breathing, planes stop travelling, and every phase still appears and
+   disappears on the same scroll positions. Every testimonial stays
+   reachable by exactly the same controls. */
+@media (prefers-reduced-motion: reduce) {
+  .piece,
+  .fieldSeat {
+    animation: none;
+  }
+  .fieldSeat {
+    transition-duration: 0.01ms;
+  }
+  .seatPhrase,
+  .seatName,
+  .step {
+    transition-duration: 0.01ms;
+  }
+  .fieldSeat::before,
+  .materialiser {
+    display: none;
+    animation: none;
+  }
+  .spotQuote {
+    clip-path: none;
+    animation: none;
+  }
+  .display {
+    mask-image: none;
+  }
+}
+
+/* ── Voice treatments ──────────────────────────────────────
+   These rules are scoped to the new detail states so the mobile reading
+   flow above remains intact. */
+.stage[data-open] .field,
+.stage[data-open] .chorusDim,
+.stage[data-open] .display,
+.stage[data-open] .statement,
+.stage[data-open] .closing {
+  opacity: 0 !important;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.field[data-open] {
+  opacity: 0 !important;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.spot[data-effect] {
+  inset: var(--padY) var(--padX);
+  display: block;
+  min-width: 0;
+  z-index: 12;
+  font-family: 'Geist Variable', 'Geist', system-ui, sans-serif;
+}
+.voiceClose {
+  position: absolute;
+  top: clamp(16px, 2.2vw, 34px);
+  right: clamp(16px, 2.2vw, 34px);
+  z-index: 30;
+  width: 44px;
+  height: 44px;
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(240, 234, 224, .2);
+  border-radius: 50%;
+  background: rgba(10, 10, 15, .46);
+  color: rgba(255, 253, 248, .86);
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  transition: border-color .24s ease, background .24s ease, color .24s ease, box-shadow .24s ease;
+}
+.voiceClose:hover {
+  border-color: color-mix(in srgb, var(--accent) 70%, #fff);
+  background: rgba(28, 27, 38, .72);
+  color: #fff;
+  box-shadow: 0 0 24px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.voiceClose:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.voiceClose svg { display: block; pointer-events: none; }
+.spot[data-effect] .detailIdentity {
+  position: relative;
+  z-index: 5;
+}
+.spot[data-effect] .spotName {
+  margin: 0;
+  font-size: clamp(30px, 3.2vw, 60px);
+  font-weight: 620;
+  line-height: 1.03;
+  letter-spacing: -0.035em;
+  color: #fffdf8;
+}
+.spot[data-effect] .spotRole {
+  margin: 10px 0 0;
+  font-size: clamp(14px, 0.92vw, 18px);
+  font-weight: 570;
+  color: color-mix(in srgb, var(--accent) 78%, #fffdf8);
+}
+.spot[data-effect] .spotUnit {
+  margin: 6px 0 0;
+  font-size: clamp(13px, 0.78vw, 15px);
+  color: rgba(240, 234, 224, 0.68);
+}
+
+/* Long — a continuous, multi-colour perimeter with a clearly travelling
+   highlight. The ring itself is never a scroll container: the copy is
+   allowed to breathe in the stage rather than being trapped in a card. */
+@property --trace-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.traceFrame {
+  position: relative;
+  grid-column: 1 / -1;
+  grid-row: 1;
+  align-self: center;
+  justify-self: center;
+  width: min(92vw, 1240px);
+  margin: auto;
+  padding: clamp(28px, 3.8vw, 58px);
+  overflow: visible;
+  border: 1px solid rgba(240, 234, 224, .2);
+  border-radius: clamp(24px, 2.5vw, 40px);
+  background: rgba(14, 13, 23, 0.92);
+  box-shadow: 0 24px 80px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.05);
+  isolation: isolate;
+}
+.traceFrame::before,
+.traceFrame::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  z-index: -1;
+  padding: 3px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--trace-angle, 0deg),
+    transparent 0deg 264deg,
+    color-mix(in srgb, var(--accent) 82%, #7258ff) 282deg,
+    #fff8e7 304deg,
+    color-mix(in srgb, var(--accent) 94%, #6fe4ff) 330deg,
+    transparent 360deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: traceOrbit 6.2s linear infinite;
+  pointer-events: none;
+}
+.traceFrame::after {
+  inset: -7px;
+  padding: 7px;
+  opacity: .92;
+  filter: blur(14px) saturate(1.7);
+}
+@keyframes traceOrbit {
+  from { --trace-angle: 0deg; }
+  to { --trace-angle: 360deg; }
+}
+.traceFrame .detailIdentity { margin-bottom: clamp(22px, 3.2vh, 38px); }
+.traceQuote {
+  max-width: 78ch;
+  font-size: clamp(18px, 1.22vw, 23px);
+  line-height: 1.58;
+  color: rgba(250, 247, 240, .94);
+}
+.traceQuote p { margin: 0; }
+.traceQuote p + p { margin-top: .85em; }
+
+/* One planetary composition for every voice. Copy stays editorial and
+   quiet on the left; the active celestial body becomes the moving light
+   source on the right. There is deliberately no thumbnail selector —
+   Previous / All voices / Next remains the only navigation. */
+.solarStage {
+  --celestial-rgb: 255, 205, 126;
+  --celestial-secondary-rgb: 255, 158, 91;
+  --celestial-saturation: .86;
+  --celestial-brightness: 1;
+  --celestial-opacity: .9;
+  --body-width: clamp(1320px, 116vw, 1760px);
+  --body-right: -28%;
+  --body-bottom: -28%;
+  --shadow-x: 59%;
+  --shadow-y: 59%;
+  position: relative;
+  grid-column: 1 / -1;
+  grid-row: 1;
+  width: 100%;
+  height: 100%;
+  min-height: min(76svh, 760px);
+  margin: auto;
+  padding: clamp(36px, 5vh, 72px) clamp(20px, 3vw, 44px) clamp(44px, 6vh, 72px);
+  display: grid;
+  grid-template-columns: minmax(0, 54%) minmax(300px, 46%);
+  align-items: center;
+  overflow: hidden;
+  isolation: isolate;
+}
+.solarStage[data-body='mercury'] {
+  --celestial-rgb: 221, 218, 205;
+  --celestial-secondary-rgb: 176, 156, 129;
+  --celestial-saturation: .55;
+  --celestial-brightness: .96;
+}
+.solarStage[data-body='venus'] {
+  --celestial-rgb: 255, 218, 160;
+  --celestial-secondary-rgb: 219, 148, 83;
+  --celestial-saturation: .78;
+  --celestial-brightness: .98;
+  --shadow-x: 57%;
+  --shadow-y: 51%;
+}
+.solarStage[data-body='moon'] {
+  --celestial-rgb: 226, 233, 255;
+  --celestial-secondary-rgb: 181, 197, 232;
+  --celestial-saturation: .24;
+  --celestial-brightness: 1.04;
+  --celestial-opacity: .74;
+}
+.solarStage[data-body='earth'] {
+  --celestial-rgb: 87, 207, 230;
+  --celestial-secondary-rgb: 77, 218, 151;
+  --celestial-saturation: .96;
+  --celestial-brightness: .9;
+  --celestial-opacity: .76;
+}
+.solarStage[data-body='mars'] {
+  --celestial-rgb: 236, 137, 87;
+  --celestial-secondary-rgb: 167, 73, 48;
+  --celestial-saturation: .9;
+  --celestial-brightness: .94;
+  --shadow-x: 62%;
+  --shadow-y: 60%;
+}
+.solarStage[data-body='jupiter'] {
+  --celestial-rgb: 242, 198, 151;
+  --celestial-secondary-rgb: 182, 112, 83;
+  --celestial-saturation: .76;
+  --celestial-brightness: .94;
+  --shadow-x: 58%;
+  --shadow-y: 56%;
+}
+.solarStage[data-body='saturn'] {
+  --celestial-rgb: 245, 222, 163;
+  --celestial-secondary-rgb: 180, 148, 101;
+  --celestial-saturation: .68;
+  --celestial-brightness: .98;
+  --body-width: clamp(1080px, 86vw, 1500px);
+  --body-right: -27%;
+  --shadow-x: 57%;
+  --shadow-y: 54%;
+}
+.solarStage[data-body='uranus'] {
+  --celestial-rgb: 174, 236, 237;
+  --celestial-secondary-rgb: 101, 191, 206;
+  --celestial-saturation: .72;
+  --celestial-brightness: .98;
+  --shadow-x: 59%;
+  --shadow-y: 54%;
+}
+.solarStage[data-body='neptune'] {
+  --celestial-rgb: 109, 155, 255;
+  --celestial-secondary-rgb: 63, 87, 220;
+  --celestial-saturation: 1.02;
+  --celestial-brightness: .9;
+}
+.solarBeam {
+  position: absolute;
+  left: 43%;
+  right: auto;
+  bottom: -8%;
+  width: 26%;
+  height: 104%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at 100% 54%,
+    rgba(var(--celestial-rgb), .14) 0%,
+    rgba(var(--celestial-secondary-rgb), .045) 27%,
+    transparent 66%
+  );
+  filter: blur(46px);
+  opacity: .22;
+  mix-blend-mode: screen;
+  animation: solarBreathe 7.2s ease-in-out infinite;
+  pointer-events: none;
+}
+.solarBeam::before {
+  display: none;
+}
+.solarCopy {
+  position: relative;
+  z-index: 4;
+  grid-column: 1;
+  width: min(100%, 690px);
+  padding-left: clamp(12px, 2.6vw, 42px);
+}
+.solarStage .detailIdentity {
+  position: relative;
+  text-align: left;
+  margin: 0 0 clamp(34px, 5vh, 62px);
+  padding-top: 17px;
+  border-top: 1px solid rgba(240, 234, 224, .18);
+}
+.solarSun {
+  position: absolute;
+  right: var(--body-right);
+  bottom: var(--body-bottom);
+  z-index: 2;
+  width: var(--body-width);
+  opacity: .88;
+  filter: none;
+  mix-blend-mode: normal;
+  animation: solarSunFloat 6.8s ease-in-out infinite;
+  pointer-events: none;
+}
+.solarSun img {
+  position: relative;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: auto;
+  opacity: .76;
+  filter: saturate(.62) brightness(.48) contrast(1.24);
+}
+.solarSun::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(
+      ellipse 23% 34% at var(--shadow-x, 59%) var(--shadow-y, 59%),
+      rgba(3, 4, 9, .97) 0 64%,
+      rgba(3, 4, 9, .9) 79%,
+      rgba(3, 4, 9, .28) 93%,
+      transparent 100%
+    ),
+    linear-gradient(
+      90deg,
+      transparent 33%,
+      rgba(3, 4, 9, .16) 49%,
+      rgba(3, 4, 9, .78) 70%,
+      rgba(3, 4, 9, .99) 96%
+    );
+  pointer-events: none;
+}
+.solarSun::after {
+  content: '';
+  position: absolute;
+  left: 25%;
+  top: 28%;
+  width: 17%;
+  height: 52%;
+  z-index: 2;
+  background: radial-gradient(
+    ellipse at 100% 50%,
+    rgba(var(--celestial-rgb), .26) 0%,
+    rgba(var(--celestial-secondary-rgb), .08) 30%,
+    transparent 72%
+  );
+  filter: blur(32px);
+  opacity: .38;
+  mix-blend-mode: screen;
+}
+.solarReveal { position: relative; width: min(100%, 64ch); margin: 0; padding: 0 0 0 clamp(22px, 2vw, 34px); }
+.solarReveal::before {
+  content: '\201C';
+  position: absolute;
+  left: 0;
+  top: -.45em;
+  font-size: clamp(34px, 3.2vw, 62px);
+  font-weight: 650;
+  color: rgba(var(--celestial-rgb), .92);
+  text-shadow: 0 0 28px rgba(var(--celestial-rgb), .32);
+}
+.solarQuote {
+  margin: 0;
+  font-size: clamp(20px, 1.42vw, 27px);
+  line-height: 1.47;
+  letter-spacing: -.012em;
+  color: #fffdf8;
+  text-shadow: 0 0 24px rgba(var(--celestial-rgb), .1);
+  clip-path: inset(0 100% 0 0);
+  animation: solarReveal 1.05s cubic-bezier(.22,1,.36,1) .08s forwards;
+}
+.solarStage[data-density='short'] .solarQuote { font-size: clamp(24px, 2vw, 36px); line-height: 1.38; max-width: 32ch; }
+.solarStage[data-density='long'] .solarQuote { font-size: clamp(17px, 1.12vw, 21px); line-height: 1.48; }
+.solarStage[data-density='xlong'] .solarQuote { font-size: clamp(15px, .98vw, 18.5px); line-height: 1.47; max-width: 65ch; }
+.solarQuote p { margin: 0; }
+.solarQuote p + p { margin-top: .85em; }
+.solarEmphasis { color: #fff; font-weight: 740; }
+@keyframes solarReveal { to { clip-path: inset(0 0 0 0); } }
+@keyframes solarBreathe {
+  0%, 100% { transform: translateY(5px) scale(.99); opacity: .12; }
+  50% { transform: translateY(-5px) scale(1.01); opacity: .22; }
+}
+@keyframes solarSunFloat {
+  0%, 100% { transform: translateY(4px) scale(.99); opacity: .78; }
+  50% { transform: translateY(-4px) scale(1.008); opacity: .84; }
+}
+
+/* Short — one vertical caret lives on the line currently being written.
+   That line comes forward, holds focus while it writes, then settles back;
+   when the final line finishes the same caret remains at its true endpoint. */
+.typeStage {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  align-self: center;
+  justify-self: center;
+  width: min(88vw, 1180px);
+  margin: auto;
+  padding: clamp(22px, 3vw, 46px) clamp(18px, 4vw, 58px);
+  transform-origin: 52% 56%;
+  /* The zoom belongs to the line currently being written, not to the
+     whole testimonial. See `.typeLineFocus` below. */
+  animation: none;
+}
+.typeStage .detailIdentity { margin-bottom: clamp(28px, 5vh, 62px); }
+.typeQuoteWrap {
+  position: relative;
+  width: min(100%, 43ch);
+  overflow: visible;
+  font-size: clamp(22px, 2.05vw, 39px);
+  font-weight: 410;
+  line-height: 1.35;
+  letter-spacing: -.021em;
+  color: #fffdf8;
+}
+.typeMeasure { position: absolute; inset: 0 auto auto 0; width: 100%; visibility: hidden; pointer-events: none; }
+.typeMeasure p { margin: 0; }
+.typeMeasure p + p { margin-top: .72em; }
+.typeLine { position: relative; display: block; width: max-content; max-width: none; min-height: 1.35em; white-space: nowrap; transform-origin: left center; will-change: transform, opacity, filter; animation: typeLineFocus calc(var(--type-duration) + .42s) cubic-bezier(.22,1,.36,1) var(--type-delay) both; }
+.typeParagraphStart { margin-top: .72em; }
+.typeLineText { display: inline-block; clip-path: inset(0 100% 0 0); animation: typeWrite var(--type-duration) steps(var(--chars), start) var(--type-delay) forwards; }
+.typeCaret { position: absolute; left: -.04em; top: .07em; width: clamp(4px,.32vw,7px); height: 1.16em; border-radius: 99px; background: linear-gradient(180deg,#fff1a9 0%,#ff5fa8 45%,#8a62ff 100%); box-shadow: 0 0 12px 3px rgba(255,91,177,.58), 0 0 28px 8px rgba(118,83,255,.34); transform: skewX(-8deg); opacity: 0; animation: caretTravel var(--type-duration) steps(var(--chars), end) var(--type-delay) forwards, caretActive var(--type-duration) linear var(--type-delay) forwards; }
+.typeLine[data-final] .typeCaret { animation: caretTravel var(--type-duration) steps(var(--chars), start) var(--type-delay) forwards, caretHold var(--type-duration) linear var(--type-delay) forwards, caretBlink 1.05s step-end calc(var(--type-delay) + var(--type-duration)) infinite; }
+@keyframes typeWrite { to { clip-path: inset(0 0 0 0); } }
+@keyframes caretTravel { to { left: calc(100% + .13em); } }
+@keyframes caretActive { 0%,99% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes caretHold { from,to { opacity: 1; } }
+@keyframes caretBlink { 0%,48% { opacity: 1; } 49%,100% { opacity: .28; } }
+@keyframes typeLineFocus {
+  0% { opacity: .42; transform: scale(.91) translateY(8px); filter: blur(.35px); }
+  18% { opacity: 1; transform: scale(1.07) translateY(-2px); filter: blur(0); }
+  72% { opacity: 1; transform: scale(1.07) translateY(-2px); filter: blur(0); }
+  100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+}
+@keyframes typeFocus { 0% { transform: scale(.998); } 50% { transform: scale(1.006); } 100% { transform: scale(1); } }
+
+.spot[data-effect] .spotNav {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(12px, 2vh, 22px);
+  translate: -50% 0;
+  z-index: 20;
+  display: flex;
+  gap: clamp(18px, 2.8vw, 44px);
+  margin: 0;
+  padding: 10px 16px;
+  border: 1px solid rgba(240,234,224,.13);
+  border-radius: 999px;
+  background: rgba(11,10,9,.64);
+  backdrop-filter: blur(16px);
+}
+.spot[data-effect] .step { min-height: 32px; padding: 0 5px; }
+
+@media (max-width: 760px) {
+  .spot[data-effect] { inset: 24px 18px; overflow: visible; }
+  .narrow .spot[data-effect] { inset: auto; }
+  .traceFrame { width: 100%; max-height: none; padding: 28px 22px; }
+  .traceQuote { font-size: 17px; line-height: 1.58; }
+  .solarStage {
+    --body-width: clamp(1040px, 250vw, 1320px);
+    --body-right: -100%;
+    --body-bottom: -24%;
+    width: 100%;
+    height: auto;
+    min-height: 76svh;
+    grid-template-columns: 1fr;
+    align-items: start;
+    padding: 58px 16px 58px;
+  }
+  .solarStage[data-body='saturn'] {
+    --body-width: clamp(860px, 214vw, 1080px);
+    --body-right: -88%;
+  }
+  .solarCopy { grid-column: 1; width: 100%; padding-left: 0; }
+  .solarStage .detailIdentity { margin-bottom: 26px; padding-top: 14px; }
+  .solarBeam { right: -54%; width: 132%; height: 100%; }
+  .solarQuote { font-size: 18px; line-height: 1.5; }
+  .solarStage[data-density='short'] .solarQuote { font-size: clamp(22px, 6.4vw, 30px); }
+  .solarStage[data-density='long'] .solarQuote { font-size: 16px; }
+  .solarStage[data-density='xlong'] .solarQuote { font-size: 14.25px; line-height: 1.44; }
+  .solarReveal { max-height: none; }
+  .typeStage { width: 100%; padding: 22px 4px; }
+  .typeQuoteWrap { font-size: clamp(21px, 6.1vw, 30px); width: 100%; }
+  .spot[data-effect] .spotNav { gap: 10px; width: calc(100% - 16px); justify-content: space-between; }
+  .spot[data-effect] .step { font-size: 10px; letter-spacing: .1em; }
+}
+
+/* The narrow experience is normal document flow, not a pinned desktop
+   stage. Keep the testimonial controls after the content so they can never
+   cover the final lines of type, trace, or solar feedback. */
+.narrow .spot[data-effect] {
+  position: relative;
+  inset: auto;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 3vh, 30px);
+  min-height: 0;
+  overflow: visible;
+}
+.narrow .traceFrame,
+.narrow .solarStage,
+.narrow .typeStage {
+  width: 100%;
+  height: auto;
+  margin: 0;
+}
+.narrow .spot[data-effect] .spotNav {
+  position: relative;
+  left: auto;
+  bottom: auto;
+  translate: none;
+  width: 100%;
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .traceFrame::before,
+  .traceFrame::after,
+  .solarBeam,
+  .solarSun,
+  .fieldSeat::before,
+  .narrowSeat::before,
+  .typeStage { animation: none; }
+  .solarQuote { clip-path: none; animation: none; }
+  .typeLine { animation: none; transform: none; }
+  .typeLineText { animation: none; clip-path: none; }
+  .typeCaret { animation: none !important; opacity: 0; }
+  .typeLine[data-final] .typeCaret { opacity: 1; }
+}
+
+/* Planetary detail: one uninterrupted editorial column, a dark body with
+   a restrained rim, and no secondary navigation competing with the copy. */
+.spot[data-effect='celestial'] {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  display: block;
   overflow: hidden;
 }
 
-.quote {
-  margin: 0;
-  max-width: 26ch;
-  font-family: inherit;
-  font-size: clamp(26px, 2.4vw + 1.6vh, 54px);
-  font-weight: 640;
-  font-variation-settings: 'wght' 640;
-  line-height: 1.22;
-  letter-spacing: -0.022em;
-  color: #f5efe4;
-  text-wrap: balance;
+.spot[data-effect='celestial']:focus {
+  outline: none;
 }
 
-.attribution {
+.spot[data-effect='celestial'] .solarStage {
+  --body-width: clamp(1680px, 185vw, 5200px);
+  --body-right: -86%;
+  --body-bottom: -42%;
+  width: 100%;
+  height: 100%;
+  min-height: 100svh;
+  padding: clamp(30px, 4.5vh, 54px) 0;
+  grid-template-columns: minmax(0, 67%) minmax(0, 33%);
+  grid-template-rows: minmax(0, 1fr);
+  align-items: center;
+  overflow: clip;
+  background: #07070c;
+}
+
+.spot[data-effect='celestial'] .solarStage[data-body='saturn'] {
+  --body-width: clamp(1500px, 170vw, 4800px);
+  --body-right: -80%;
+  --body-bottom: -38%;
+}
+
+.spot[data-effect='celestial'] .solarCopy {
+  position: relative;
+  z-index: 5;
+  grid-column: 1;
+  width: min(100%, 1040px);
+  max-height: none;
+  overflow: visible;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 8px;
+  padding: 0 clamp(30px, 3.6vw, 68px) 0 clamp(48px, 5vw, 96px);
+  box-sizing: border-box;
 }
 
-.attributionRule {
-  width: 42px;
-  height: 2px;
-  border-radius: 2px;
-}
-
-.attributionName {
-  font-size: clamp(13px, 1.9vh, 16px);
-  font-weight: 640;
-  letter-spacing: 0.22em;
-  text-indent: 0.22em;
+.solarKicker {
+  width: 100%;
+  display: block;
+  margin: 0 0 clamp(14px, 2.2vh, 24px);
+  padding: 0 0 9px;
+  border: 0;
+  border-bottom: 1px solid rgba(240, 234, 224, .18);
+  background: transparent;
+  color: rgba(240, 234, 224, .58);
+  font-size: clamp(11px, .72vw, 13px);
+  font-weight: 720;
+  letter-spacing: .32em;
   text-transform: uppercase;
-  color: #f5efe4;
+  text-align: left;
+  cursor: pointer;
 }
 
-.attributionRole {
-  font-size: clamp(11.5px, 1.65vh, 13.5px);
-  letter-spacing: 0.16em;
-  text-indent: 0.16em;
-  text-transform: uppercase;
-  color: rgba(245, 239, 228, 0.55);
+.solarKicker:hover,
+.solarKicker:focus-visible {
+  color: rgb(var(--celestial-rgb));
 }
 
-/* ── Mobile ──────────────────────────────────────────────── */
-@media (max-width: 640px) {
-  .titleMain {
-    font-size: clamp(28px, 8.4vw, 36px);
+.spot[data-effect='celestial'] .solarReveal {
+  width: min(100%, 940px);
+  margin: 0;
+  padding: clamp(14px, 2.4vh, 24px) 0 0;
+  min-height: auto;
+  overflow: visible;
+}
+
+.spot[data-effect='celestial'] .solarReveal::before {
+  left: 0;
+  top: -.48em;
+  font-size: clamp(36px, 3.2vw, 58px);
+}
+
+.spot[data-effect='celestial'] .solarQuote {
+  max-width: 70ch;
+  font-size: clamp(19px, 1.18vw, 22px);
+  line-height: 1.44;
+  font-weight: 410;
+  color: rgba(255, 253, 248, .9);
+}
+
+.spot[data-effect='celestial'] .solarStage[data-density='short'] .solarQuote {
+  max-width: 48ch;
+  font-size: clamp(20px, 1.36vw, 25px);
+  line-height: 1.4;
+}
+
+.spot[data-effect='celestial'] .solarStage[data-density='medium'] .solarQuote {
+  max-width: 66ch;
+  font-size: clamp(19px, 1.18vw, 22px);
+  line-height: 1.44;
+}
+
+.spot[data-effect='celestial'] .solarStage[data-density='long'] .solarQuote {
+  max-width: 72ch;
+  font-size: clamp(17.5px, 1.06vw, 19.5px);
+  line-height: 1.43;
+}
+
+.spot[data-effect='celestial'] .solarStage[data-density='xlong'] .solarQuote {
+  max-width: 78ch;
+  font-size: clamp(18px, 1.04vw, 19px);
+  line-height: 1.42;
+}
+
+.spot[data-effect='celestial'] .solarStage .detailIdentity {
+  flex: none;
+  margin: clamp(14px, 2.2vh, 24px) 0 0;
+  padding: 12px 0 0;
+  border: 0;
+  border-top: 1px solid rgba(240, 234, 224, .16);
+  text-align: left;
+}
+
+.spot[data-effect='celestial'] .solarStage .spotName {
+  position: static;
+  width: auto;
+  height: auto;
+  margin: 0 0 5px;
+  padding: 0;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+  color: #fffdf8;
+  font-size: clamp(22px, 1.5vw, 28px);
+  line-height: 1.12;
+  font-weight: 680;
+  letter-spacing: -.02em;
+}
+
+.spot[data-effect='celestial'] .solarStage .spotRole {
+  margin: 0;
+  color: rgb(var(--celestial-rgb));
+  font-size: clamp(14px, .92vw, 17px);
+  font-weight: 650;
+}
+
+.spot[data-effect='celestial'] .solarStage .spotUnit {
+  margin-top: 3px;
+  color: rgba(240, 234, 224, .62);
+  font-size: clamp(13px, .82vw, 15px);
+}
+
+.spot[data-effect='celestial'] .solarSun {
+  right: var(--body-right);
+  bottom: var(--body-bottom);
+  width: var(--body-width);
+  opacity: .96;
+}
+
+.spot[data-effect='celestial'] .solarSun img {
+  opacity: .96;
+  filter: saturate(.56) brightness(.82) contrast(1.24);
+}
+
+.spot[data-effect='celestial'] .solarSun::before {
+  background:
+    radial-gradient(
+      ellipse 15.5% 23.5% at var(--shadow-x, 59%) var(--shadow-y, 59%),
+      rgba(3, 4, 9, .98) 0 68%,
+      rgba(3, 4, 9, .91) 82%,
+      rgba(3, 4, 9, .26) 94%,
+      transparent 100%
+    ),
+    linear-gradient(
+      90deg,
+      transparent 39%,
+      rgba(3, 4, 9, .08) 42%,
+      rgba(3, 4, 9, .76) 47%,
+      rgba(3, 4, 9, .97) 55%,
+      rgba(3, 4, 9, .99) 100%
+    );
+}
+
+.spot[data-effect='celestial'] .solarSun::after {
+  left: 39%;
+  top: 31%;
+  width: 13%;
+  height: 42%;
+  opacity: .62;
+}
+
+.spot[data-effect='celestial'] .solarQuote p + p {
+  margin-top: .68em;
+}
+
+@media (min-width: 900px) and (max-height: 820px) {
+  .spot[data-effect='celestial'] .solarStage {
+    padding-block: 26px;
   }
-  .titleLine {
-    white-space: normal;
+
+  .solarKicker {
+    margin-bottom: 12px;
+    padding-bottom: 7px;
   }
-  .quote {
-    font-size: clamp(20px, 5.8vw, 26px);
-    max-width: 100%;
+
+  .spot[data-effect='celestial'] .solarReveal {
+    padding-top: 12px;
+  }
+
+  .spot[data-effect='celestial'] .solarStage .detailIdentity {
+    margin-top: 12px;
+    padding-top: 10px;
+  }
+}
+
+@media (max-width: 899px) {
+  .narrowVoicePortal {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    background: #07070c;
+  }
+
+  .narrowVoicePortal:not([data-open]) {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .narrowVoicePortal .spot[data-effect='celestial'] {
+    position: relative;
+    inset: auto;
+    z-index: auto;
+    display: block;
+    min-height: 100%;
+    overflow: visible;
+  }
+
+  .spot[data-effect='celestial'] .solarStage {
+    --body-width: clamp(860px, 225vw, 1160px);
+    --body-right: -92%;
+    --body-bottom: -13%;
+    min-height: 100svh;
+    height: auto;
+    padding: 62px 0 64px;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    align-items: start;
+    overflow: visible;
+  }
+
+  .spot[data-effect='celestial'] .solarStage[data-body='saturn'] {
+    --body-width: clamp(780px, 205vw, 1020px);
+    --body-right: -80%;
+    --body-bottom: -8%;
+  }
+
+  .spot[data-effect='celestial'] .solarCopy {
+    max-height: none;
+    overflow: visible;
+    padding: 0 22px 24px;
+  }
+
+  .solarKicker {
+    margin-bottom: 16px;
+  }
+
+  .spot[data-effect='celestial'] .solarReveal {
+    width: 100%;
+    padding-top: 18px;
+    overflow: visible;
+  }
+
+  .spot[data-effect='celestial'] .solarQuote {
+    max-width: none;
+    font-size: 17px;
+    line-height: 1.52;
+  }
+
+  .spot[data-effect='celestial'] .solarStage[data-density='short'] .solarQuote {
+    max-width: 42ch;
+    font-size: 19px;
+    line-height: 1.46;
+  }
+
+  .spot[data-effect='celestial'] .solarStage[data-density='medium'] .solarQuote {
+    font-size: 17px;
+    line-height: 1.52;
+  }
+
+  .spot[data-effect='celestial'] .solarStage[data-density='long'] .solarQuote {
+    font-size: 16px;
+    line-height: 1.54;
+  }
+
+  .spot[data-effect='celestial'] .solarStage[data-density='xlong'] .solarQuote {
+    font-size: 15.5px;
+    line-height: 1.56;
+  }
+
+  .spot[data-effect='celestial'] .solarStage .detailIdentity {
+    margin-top: 18px;
+    padding-top: 12px;
   }
 }

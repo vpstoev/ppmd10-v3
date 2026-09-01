@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ProjectsVisual } from './ppmd-projects/ProjectsVisual'
+import { ProjectShape } from './ppmd-projects/ProjectShape'
 import {
   CLOSING_LINE1_IN,
   CLOSING_LINE2_IN,
@@ -44,7 +45,7 @@ function useReducedMotion(): boolean {
 export default function ProjectsThatShapedTheDecade() {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const reducedMotion = useReducedMotion()
-  const webgl = useMemo(detectWebGL, [])
+  const webgl = useMemo(() => detectWebGL(), [])
   const isMobile = useMemo(() => window.innerWidth < 768, [])
 
   if (!webgl) return <StaticFallback />
@@ -64,7 +65,7 @@ export default function ProjectsThatShapedTheDecade() {
             isMobile={isMobile}
           />
         </div>
-        <TextLayer containerRef={containerRef} />
+        <TextLayer containerRef={containerRef} reducedMotion={reducedMotion} />
       </div>
     </section>
   )
@@ -83,7 +84,13 @@ function revealStyle(kind: Project['reveal'], enter: number): React.CSSPropertie
   return {}
 }
 
-function TextLayer({ containerRef }: { containerRef: React.RefObject<HTMLDivElement | null> }) {
+function TextLayer({
+  containerRef,
+  reducedMotion,
+}: {
+  containerRef: React.RefObject<HTMLDivElement | null>
+  reducedMotion: boolean
+}) {
   const [p, setP] = useState(0)
 
   useEffect(() => {
@@ -136,24 +143,32 @@ function TextLayer({ containerRef }: { containerRef: React.RefObject<HTMLDivElem
         const visible = w > 0.02
         return (
           <div
-            key={proj.bigNum}
+            key={proj.id}
             className={proj.side === 'left' ? s.projBlock : `${s.projBlock} ${s.projRight}`}
             style={{ visibility: visible ? undefined : 'hidden' }}
           >
+            {/* The scene's own abstract figure, behind everything. */}
+            <ProjectShape
+              placement={proj.shape}
+              accent={proj.accent}
+              presence={enter}
+              flip={proj.side === 'right'}
+              reducedMotion={reducedMotion}
+            />
             <span
               className={
-                proj.iridescent ? `${s.bigNum} ${s.bigNumIridescent}` : s.bigNum
+                proj.accent.iridescent ? `${s.bigNum} ${s.bigNumIridescent}` : s.bigNum
               }
               aria-hidden="true"
               style={{
                 opacity: enter,
                 transform: `scale(${1.12 - 0.12 * enter}) translateY(${(1 - enter) * 26}px)`,
-                ...(proj.iridescent ? {} : { color: `${proj.accent}29` }),
+                ...(proj.accent.iridescent ? {} : { color: `${proj.accent.dominant}29` }),
               }}
             >
               {proj.bigNum}
             </span>
-            <div className={s.content}>
+            <div className={s.content} style={{ ['--project-accent' as string]: proj.accent.dominant }}>
               <div
                 className={proj.reveal === 'mask' ? s.maskWrap : undefined}
                 style={proj.reveal === 'mask' ? { opacity: Math.min(1, w * 2) } : undefined}
@@ -166,15 +181,20 @@ function TextLayer({ containerRef }: { containerRef: React.RefObject<HTMLDivElem
                       : revealStyle(proj.reveal, enter)
                   }
                 >
-                  <p className={s.meta} style={{ color: proj.accent }}>
-                    <span className={s.metaNum}>{proj.num}</span>
-                    {proj.category}
-                  </p>
+                  {proj.category && (
+                    <p className={s.meta} style={{ color: proj.accent.dominant }}>
+                      {proj.category}
+                    </p>
+                  )}
                   <h3 className={s.projName}>{proj.name}</h3>
-                  <p className={s.description}>{proj.description}</p>
-                  <p className={s.impact} style={{ color: proj.accent }}>
-                    {proj.impact}
-                  </p>
+                  {/* Optional because the importer omits only empty or
+                      confirmed template-filler cells. */}
+                  {proj.description && <p className={s.description}>{proj.description}</p>}
+                  {proj.impact && (
+                    <p className={s.impact} style={{ color: proj.accent.dominant }}>
+                      {proj.impact}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -215,16 +235,19 @@ function StaticFallback() {
         </p>
       </div>
       {PROJECTS.map((proj) => (
-        <div key={proj.bigNum} className={s.fbBlock}>
-          <p className={s.meta} style={{ color: proj.accent }}>
-            <span className={s.metaNum}>{proj.num}</span>
-            {proj.category}
-          </p>
+        <div key={proj.id} className={s.fbBlock}>
+          {proj.category && (
+            <p className={s.meta} style={{ color: proj.accent.dominant }}>
+              {proj.category}
+            </p>
+          )}
           <h3 className={s.projName}>{proj.name}</h3>
-          <p className={s.description}>{proj.description}</p>
-          <p className={s.impact} style={{ color: proj.accent }}>
-            {proj.impact}
-          </p>
+          {proj.description && <p className={s.description}>{proj.description}</p>}
+          {proj.impact && (
+            <p className={s.impact} style={{ color: proj.accent.dominant }}>
+              {proj.impact}
+            </p>
+          )}
         </div>
       ))}
       <div className={`${s.fbBlock} ${s.fbClosing}`}>

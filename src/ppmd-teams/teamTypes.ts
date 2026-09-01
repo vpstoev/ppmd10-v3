@@ -12,6 +12,8 @@ export interface Team {
   name: string
   /** Header title for the team people chapter (no numbering). */
   rosterTitle: string
+  /** One supporting line under the roster header — what this field is. */
+  rosterLede: string
   headline: string
   description: string
   accent: string
@@ -34,6 +36,7 @@ export interface LeadershipProfileData {
   title: string
   organisationalUnit: string
   statement: string
+  statementEmphasis?: string[]
   /** What the scene communicates, e.g. "Area Vision". */
   sceneKicker: string
   photo?: string
@@ -42,8 +45,11 @@ export interface LeadershipProfileData {
   photoPosition?: string
   quote?: string
   shortBio?: string
+  shortBioEmphasis?: string[]
   keyContribution?: string
+  keyContributionEmphasis?: string[]
   personalFact?: string
+  personalFactEmphasis?: string[]
   accent: string
   displayOrder: number
 }

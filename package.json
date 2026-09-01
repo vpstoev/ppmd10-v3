@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "import:content": "node scripts/import-content.mjs",
+    "import:content:check": "node scripts/import-content.mjs --check"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.9",

@@ -56,9 +56,15 @@ export default function SectionNavigation() {
   }, [open])
 
   const go = (id: string) => {
-    document
-      .getElementById(`ppmd-${id}`)
-      ?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' })
+    const target = document.getElementById(`ppmd-${id}`)
+    if (target && id === 'voices') {
+      /* The global `scroll-behavior: smooth` otherwise scrubs the entire
+         pinned Voices timeline while navigating to it from a later section. */
+      const top = target.getBoundingClientRect().top + window.scrollY
+      window.scrollTo({ top, behavior: 'instant' as ScrollBehavior })
+    } else {
+      target?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' })
+    }
     setOpen(false)
   }
 

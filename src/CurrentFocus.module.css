@@ -25,6 +25,118 @@
   z-index: 2;
 }
 
+/* A quiet visual instrument behind the copy. The canvas supplies motion
+   texture, while these large rings and the soft core give Current Focus a
+   readable stage even when WebGL is muted or the page is held still. */
+.atmosphere {
+  position: absolute;
+  inset: -12%;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.9;
+  background:
+    radial-gradient(circle at 73% 47%, color-mix(in srgb, var(--focus-accent, #9d6bff) 24%, transparent), transparent 28%),
+    radial-gradient(circle at 26% 64%, color-mix(in srgb, #e8c188 14%, transparent), transparent 34%),
+    linear-gradient(130deg, rgba(7, 7, 12, 0.12), rgba(157, 107, 255, 0.035) 52%, rgba(7, 7, 12, 0.22));
+  animation: focusAtmosphereBreath 12s ease-in-out infinite;
+}
+
+.atmosphereRing {
+  position: absolute;
+  display: block;
+  border: 1.5px solid color-mix(in srgb, var(--focus-accent, #9d6bff) 46%, transparent);
+  border-radius: 50%;
+  box-shadow: 0 0 22px color-mix(in srgb, var(--focus-accent, #9d6bff) 13%, transparent);
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.atmosphereRingOne {
+  width: min(72vw, 1120px);
+  height: min(72vw, 1120px);
+  left: 13%;
+  top: 8%;
+  opacity: 0.44;
+  animation: focusOrbit 28s linear infinite;
+}
+
+.atmosphereRingTwo {
+  width: min(48vw, 760px);
+  height: min(24vw, 380px);
+  left: 39%;
+  top: 37%;
+  border-color: color-mix(in srgb, #e8c188 24%, transparent);
+  opacity: 0.55;
+  transform: rotate(-24deg);
+  animation: focusOrbitReverse 22s linear infinite;
+}
+
+.atmosphereCore {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(64vw, 980px);
+  height: min(64vw, 980px);
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--focus-accent, #9d6bff) 17%, transparent) 0%,
+    color-mix(in srgb, var(--focus-accent, #9d6bff) 7%, transparent) 32%,
+    transparent 70%
+  );
+  filter: blur(20px);
+  opacity: 0.62;
+  animation: focusPulse 8s ease-in-out infinite;
+}
+
+.atmosphereSweep {
+  position: absolute;
+  left: -30%;
+  top: 54%;
+  width: 160%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--focus-accent, #9d6bff) 9%, transparent) 35%, color-mix(in srgb, #f5efe4 25%, transparent) 50%, color-mix(in srgb, var(--focus-accent, #9d6bff) 9%, transparent) 65%, transparent 100%);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--focus-accent, #9d6bff) 18%, transparent);
+  opacity: 0.48;
+  animation: focusSweep 9s ease-in-out infinite;
+}
+
+@keyframes focusAtmosphereBreath {
+  0%,
+  100% { transform: scale(0.985); opacity: 0.68; }
+  50% { transform: scale(1.015); opacity: 0.9; }
+}
+
+@keyframes focusOrbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes focusOrbitReverse {
+  from { transform: rotate(-24deg); }
+  to { transform: rotate(-384deg); }
+}
+
+@keyframes focusPulse {
+  0%,
+  100% { transform: scale(0.96); opacity: 0.42; }
+  50% { transform: scale(1.04); opacity: 0.7; }
+}
+
+@keyframes focusSweep {
+  0%,
+  100% { transform: translateX(-5%); opacity: 0.18; }
+  50% { transform: translateX(5%); opacity: 0.56; }
+}
+
+.title,
+.focusBlock,
+.closing {
+  z-index: 1;
+}
+
 /* ── Title ───────────────────────────────────────────────── */
 .title {
   position: absolute;
@@ -89,10 +201,15 @@
   left: clamp(24px, 7vw, 130px);
   top: 50%;
   translate: 0 -50%;
-  max-width: min(50vw, 640px);
+  max-width: min(54vw, 740px);
   display: flex;
   flex-direction: column;
-  gap: clamp(10px, 2vh, 18px);
+  gap: clamp(14px, 2.2vh, 22px);
+  padding: clamp(22px, 3.4vh, 36px) clamp(22px, 3vw, 42px);
+  border-left: 3px solid color-mix(in srgb, var(--focus-card-accent, #9d6bff) 84%, #fff4df);
+  border-radius: 0 18px 18px 0;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--focus-card-accent, #9d6bff) 12%, rgba(7, 7, 12, 0.82)), rgba(7, 7, 12, 0.26) 72%, transparent);
+  box-shadow: -24px 0 70px color-mix(in srgb, var(--focus-card-accent, #9d6bff) 13%, transparent);
   text-shadow: 0 2px 22px rgba(4, 4, 8, 0.78);
 }
 .focusRight .focusContent {
@@ -100,17 +217,11 @@
   right: clamp(24px, 7vw, 130px);
 }
 
-.focusMeta {
-  font-size: clamp(14px, 2.1vh, 18px);
-  font-weight: 720;
-  letter-spacing: 0.1em;
-}
-
 .focusName {
   margin: 0;
   max-width: 13ch;
   font-family: inherit;
-  font-size: clamp(34px, 4.2vw, 74px);
+  font-size: clamp(42px, 4.8vw, 84px);
   font-weight: 720;
   font-variation-settings: 'wght' 720;
   line-height: 0.98;
@@ -121,9 +232,9 @@
 
 .focusLine {
   max-width: 40ch;
-  font-size: clamp(15px, 2.1vh, 18px);
+  font-size: clamp(18px, 2.35vh, 22px);
   line-height: 1.6;
-  color: rgba(245, 239, 228, 0.78);
+  color: rgba(245, 239, 228, 0.9);
 }
 
 /* ── Closing ─────────────────────────────────────────────── */
@@ -172,13 +283,14 @@
     bottom: 10vh;
     translate: none;
     max-width: 100%;
+    padding: 20px 18px;
   }
   .focusName {
-    font-size: clamp(28px, 8vw, 34px);
+    font-size: clamp(32px, 9vw, 40px);
     max-width: 100%;
   }
   .focusLine {
-    font-size: 15px;
+    font-size: 17px;
   }
   .closingMain {
     font-size: clamp(28px, 8vw, 36px);
@@ -187,12 +299,15 @@
 
 /* ── No-WebGL fallback ───────────────────────────────────── */
 .fallback {
+  position: relative;
+  overflow: hidden;
   background: #07070c;
   font-family: 'Geist Variable', 'Geist', system-ui, sans-serif;
 }
 
 .fbBlock {
   position: relative;
+  z-index: 1;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
@@ -204,4 +319,36 @@
 .fbCenter {
   align-items: center;
   text-align: center;
+}
+
+@media (max-width: 640px) {
+  .atmosphere {
+    inset: -18%;
+    opacity: 0.58;
+  }
+  .atmosphereRingOne {
+    width: 120vw;
+    height: 120vw;
+    left: -10%;
+    top: 14%;
+  }
+  .atmosphereRingTwo {
+    width: 82vw;
+    height: 42vw;
+    left: 19%;
+    top: 43%;
+  }
+  .atmosphereCore {
+    width: 120vw;
+    height: 120vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atmosphere,
+  .atmosphereRing,
+  .atmosphereCore,
+  .atmosphereSweep {
+    animation: none;
+  }
 }

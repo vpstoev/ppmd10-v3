@@ -8,7 +8,17 @@
       name="description"
       content="Ten years of the A1 Project & Processes Management Department — delivery, structure and quality, and the people behind all of it."
     />
-    <meta name="theme-color" content="#0a0a0d" />
+    <meta name="theme-color" content="#f7f2e9" />
+    <!-- The experience opens on the ivory hero. This inline rule is the very
+         first style the parser sees, so the first painted frame is already
+         the hero's background — no dark frame before React or WebGL start. -->
+    <style>
+      html,
+      body,
+      #root {
+        background-color: #f7f2e9;
+      }
+    </style>
     <!-- Fonts: Sora (display/labels) + Inter (body). Preconnect + swap to minimize layout shift. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

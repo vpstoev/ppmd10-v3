@@ -1,6 +1,11 @@
 /** Types for the people rosters. */
 
-export type PersonLevel = 'team-lead' | 'team-member'
+/**
+ * `program-manager` sits between the two original levels: those people are
+ * part of the team's leadership group (and render with the existing
+ * leadership treatment) but are not the Team Leader.
+ */
+export type PersonLevel = 'team-lead' | 'program-manager' | 'team-member'
 
 export interface Person {
   id: string
@@ -12,9 +17,21 @@ export interface Person {
   photoAlt?: string
   /** CSS object-position, e.g. "center", "top", "50% 25%". */
   photoPosition?: string
-  shortBio: string
-  keyContribution: string
-  personalFact: string
+  /**
+   * Descriptive copy is optional throughout, and that is deliberate: a
+   * profile shows what is actually known about a person. A field with no
+   * signed-off content is absent, never filled with a stand-in.
+   */
+  shortBio?: string
+  shortBioEmphasis?: string[]
+  /** One compact line for the roster card — shorter than `shortBio`. */
+  cardBio?: string
+  /** Optional pull quote; the shared dialog already renders one when set. */
+  quote?: string
+  keyContribution?: string
+  keyContributionEmphasis?: string[]
+  personalFact?: string
+  personalFactEmphasis?: string[]
   accent: string
   isLeadership: boolean
   leadershipLevel: PersonLevel
@@ -24,8 +41,20 @@ export interface Person {
   displayOrder: number
 }
 
-/** Kind of profile shown in the shared detail dialog. */
-export type ProfileType = 'senior-director' | 'department-head' | 'team-leadership' | 'team-member'
+/**
+ * Kind of profile shown in the shared detail dialog.
+ *
+ * `voice` is a testimonial rather than a colleague of the department:
+ * same panel, same behaviour, and no portrait — the dialog already falls
+ * back to a typographic monogram when a record has no photograph, which
+ * is what these have.
+ */
+export type ProfileType =
+  | 'senior-director'
+  | 'department-head'
+  | 'team-leadership'
+  | 'team-member'
+  | 'voice'
 
 /**
  * Normalized shape consumed by the ONE shared profile-detail dialog —
@@ -34,10 +63,10 @@ export type ProfileType = 'senior-director' | 'department-head' | 'team-leadersh
 export interface ProfileDetailData {
   id: string
   /** Small label above the name (SENIOR DIRECTOR, TEAM LEAD, role, …). */
-  label: string
+  label?: string
   name: string
-  /** Exact role / position. */
-  role: string
+  /** Exact role / position — absent while a title is unconfirmed. */
+  role?: string
   /** Team or organisational unit. */
   unit: string
   profileType: ProfileType
@@ -45,8 +74,11 @@ export interface ProfileDetailData {
   photoAlt?: string
   photoPosition?: string
   shortBio?: string
+  shortBioEmphasis?: string[]
   quote?: string
   keyContribution?: string
+  keyContributionEmphasis?: string[]
   personalFact?: string
+  personalFactEmphasis?: string[]
   accent: string
 }

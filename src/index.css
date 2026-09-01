@@ -171,10 +171,14 @@
 
 html {
   scroll-behavior: smooth;
+  /* The page opens on the ivory hero and every later section paints its own
+     opaque ink, so the document background is the hero's — never a dark
+     frame while the app boots. */
+  background-color: #f7f2e9;
 }
 
 body {
-  background: var(--bg);
+  background: #f7f2e9;
   color: var(--text);
   font-family: var(--font-sans);
   font-size: 17px;
@@ -190,7 +194,17 @@ body {
   }
 }
 
-/* Ambient page background: aurora glow + grid */
+/* Ambient page background: aurora glow + grid.
+   Belongs to the dark App/AppPrototype shells and is paired with
+   `body { background: var(--bg) }`. The live entry (ExperiencePage) opens on
+   the ivory hero and every section paints its own opaque ink, so these
+   layers would only ever be seen tinting the light background before React
+   mounts. Restore both together if the dark shell is brought back. */
+body::before,
+body::after {
+  display: none;
+}
+
 body::before {
   content: '';
   position: fixed;

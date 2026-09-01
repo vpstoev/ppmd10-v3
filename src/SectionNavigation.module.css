@@ -60,9 +60,12 @@
   scale: 1.35;
 }
 .railItem:focus-visible {
-  outline: 2px solid #ff6e79;
-  outline-offset: 2px;
-  border-radius: 4px;
+  outline: none;
+}
+.railItem:focus-visible .railDot {
+  outline: 1px solid rgba(245, 239, 228, 0.88);
+  outline-offset: 4px;
+  box-shadow: 0 0 12px rgba(157, 107, 255, 0.55);
 }
 
 /* ── Mobile ──────────────────────────────────────────────── */

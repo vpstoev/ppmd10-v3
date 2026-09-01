@@ -1,11 +1,23 @@
 /**
- * Content and scroll choreography for "Projects that Shaped the Decade".
- * ALL project copy lives here (placeholder wording) so it can be replaced
- * later without touching component structure.
+ * "Projects that Shaped the Decade" — the sixteen projects the workbook
+ * marks for the site, and the choreography that carries them.
+ *
+ * Names, categories, descriptions and impact lines come from the workbook.
+ * The importer removes only confirmed template filler, so each scene can
+ * show the reviewed project story without carrying stale placeholder copy.
+ *
+ * Colour and figure are looked up by workbook id, in `projectAccents` and
+ * in the placement table below. Both are authored and both are keyed, so
+ * a project always draws the same way, and re-ordering the sheet moves a
+ * project's scene without changing its identity.
  */
+import { PROJECT_ACCENTS } from './projectAccents'
+import type { ShapePlacement } from './ProjectShape'
+import { WB_PROJECTS } from '../ppmd-content/workbookContent'
 import type { MorphSpan, Project } from './projectTypes'
 
-export const PROJECTS_VH = 760
+/* Sixteen scenes with room to be read, plus an opening and a close. */
+export const PROJECTS_VH = 1800
 
 /** Palette continuity with the rest of the experience. */
 export const INK = '#07070c'
@@ -16,105 +28,105 @@ export const P_ICE = '#7cc4ff'
 export const P_CHAMPAGNE = '#e8c188'
 export const P_WHITE = '#fff1e0'
 
-export const TITLE_OUT: readonly [number, number] = [0.075, 0.115]
-export const CLOSING_LINE1_IN: readonly [number, number] = [0.92, 0.95]
-export const CLOSING_LINE2_IN: readonly [number, number] = [0.945, 0.98]
-
-export const PROJECTS: Project[] = [
-  {
-    num: '01 / 06',
-    bigNum: '01',
-    name: '3G SUNSET',
-    category: 'Network Transformation',
-    description:
-      'Coordinating a complex transition across technology, business, operations and customer-facing teams.',
-    impact: 'Transforming critical infrastructure while protecting continuity and customer experience.',
-    accent: '#f2b183', /* champagne warmed by coral */
-    reveal: 'mask',
-    side: 'left',
-    window: [0.1, 0.15, 0.21, 0.26],
-  },
-  {
-    num: '02 / 06',
-    bigNum: '02',
-    name: '5G IMPLEMENTATION',
-    category: 'Strategic Technology Delivery',
-    description:
-      'Supporting the coordinated introduction of a new generation of connectivity across multiple delivery areas.',
-    impact: 'Turning a strategic technology ambition into coordinated execution.',
-    accent: '#8f9df5', /* ice meeting violet */
-    reveal: 'clip',
-    side: 'right',
-    window: [0.24, 0.29, 0.35, 0.4],
-  },
-  {
-    num: '03 / 06',
-    bigNum: '03',
-    name: 'VOICE OVER WI-FI',
-    category: 'Customer Experience',
-    description:
-      'Connecting technical implementation, business readiness and customer-facing processes around a new service.',
-    impact: 'Bringing technology and customer value together.',
-    accent: P_ICE,
-    reveal: 'depth',
-    side: 'left',
-    window: [0.38, 0.43, 0.49, 0.54],
-  },
-  {
-    num: '04 / 06',
-    bigNum: '04',
-    name: 'SAP S/4HANA — MONBAT',
-    category: 'Enterprise Transformation',
-    description:
-      'Managing complex delivery dependencies across business processes, technology and organisational stakeholders.',
-    impact: 'Creating structure around large-scale enterprise change.',
-    accent: '#d76ea8', /* violet–coral blend */
-    reveal: 'mask',
-    side: 'right',
-    window: [0.52, 0.57, 0.63, 0.68],
-  },
-  {
-    num: '05 / 06',
-    bigNum: '05',
-    name: 'BULGARIAN CUSTOMS AGENCY',
-    category: 'Public Sector Delivery',
-    description:
-      'Supporting the delivery of complex solutions in a regulated environment with multiple stakeholders and dependencies.',
-    impact: 'Structured delivery where precision and accountability matter most.',
-    accent: P_CHAMPAGNE,
-    reveal: 'clip',
-    side: 'left',
-    window: [0.66, 0.71, 0.77, 0.82],
-  },
-  {
-    num: '06 / 06',
-    bigNum: '06',
-    name: 'ENTITLEMENT SERVER PROGRAM',
-    category: 'Multi-Country Programme',
-    description:
-      'Coordinating countries, vendors, governance and interconnected workstreams within a shared programme environment.',
-    impact: 'Creating alignment across borders, systems and delivery teams.',
-    accent: '#c490d9', /* partial iridescent */
-    iridescent: true,
-    reveal: 'depth',
-    side: 'right',
-    window: [0.8, 0.85, 0.9, 0.945],
-  },
-]
+export const TITLE_OUT: readonly [number, number] = [0.032, 0.062]
+export const CLOSING_LINE1_IN: readonly [number, number] = [0.925, 0.952]
+export const CLOSING_LINE2_IN: readonly [number, number] = [0.947, 0.978]
 
 /**
- * Particle-shape morph schedule: 8 shapes (intro constellations, six
- * project structures, closing convergence) morphing sequentially.
+ * The figure behind each scene, keyed by workbook id.
+ *
+ * Ten compositions across sixteen projects, so six repeat — and where one
+ * repeats it is cropped, turned and scaled differently enough that the
+ * two are not read as the same picture. No figure is ever adjacent to
+ * itself, and neither is a dominant colour: the section is read in order,
+ * and two neighbours that look alike read as one scene that failed to
+ * change.
+ */
+const SHAPES: Record<string, ShapePlacement> = {
+  'PRJ-01': { kind: 'orbitalRings', scale: 1.15, rotate: -12, x: -14, y: -6, strength: 0.9 },
+  'PRJ-02': { kind: 'diagonalBeam', scale: 1.35, rotate: 0, x: 10, y: 4, strength: 0.85 },
+  'PRJ-03': { kind: 'concentricContours', scale: 1.6, rotate: 8, x: 16, y: -12, strength: 0.8 },
+  'PRJ-04': { kind: 'archFrame', scale: 1.1, rotate: -4, x: -8, y: 8, strength: 0.95 },
+  'PRJ-05': { kind: 'clippedPolygon', scale: 1.25, rotate: 16, x: 12, y: -8, strength: 0.85 },
+  'PRJ-06': { kind: 'splitArcs', scale: 1.45, rotate: -8, x: -18, y: 2, strength: 0.8 },
+  'PRJ-07': { kind: 'meshWave', scale: 1.2, rotate: -14, x: 8, y: 10, strength: 0.9 },
+  'PRJ-08': { kind: 'capsuleStack', scale: 1.3, rotate: 6, x: -12, y: -10, strength: 0.85 },
+  'PRJ-09': { kind: 'radialFlare', scale: 1.05, rotate: 22, x: 14, y: 6, strength: 0.9 },
+  'PRJ-10': { kind: 'isoGrid', scale: 1.5, rotate: 0, x: -10, y: -4, strength: 0.75 },
+  /* From here the ten begin to repeat — each at a different crop. */
+  'PRJ-11': { kind: 'diagonalBeam', scale: 1.7, rotate: 180, x: -16, y: -8, strength: 0.8 },
+  'PRJ-12': { kind: 'orbitalRings', scale: 1.75, rotate: 74, x: 18, y: 12, strength: 0.75 },
+  'PRJ-13': { kind: 'splitArcs', scale: 1.1, rotate: 96, x: 6, y: -14, strength: 0.9 },
+  'PRJ-14': { kind: 'concentricContours', scale: 1.05, rotate: -22, x: -20, y: 10, strength: 0.95 },
+  /* RRF: quiet curved traces — no bars or grid behind the copy. */
+  'PRJ-15': { kind: 'splitArcs', scale: 1.28, rotate: 18, x: -10, y: 4, strength: 0.5 },
+  /* Entitlement Server: a low-contrast wave, leaving the long description clear. */
+  'PRJ-16': { kind: 'meshWave', scale: 1.18, rotate: -12, x: 10, y: 0, strength: 0.38 },
+}
+
+/** A last-resort figure, so a new workbook row is never drawn bare. */
+const FALLBACK_SHAPE: ShapePlacement = {
+  kind: 'concentricContours',
+  scale: 1.3,
+  rotate: 0,
+  x: 0,
+  y: 0,
+  strength: 0.8,
+}
+
+/** Reveal technique, cycled so no two neighbours arrive the same way. */
+const REVEALS = ['mask', 'clip', 'depth'] as const
+
+/**
+ * Sixteen scenes between the title and the close.
+ *
+ * Each project holds the frame for about a twentieth of the section, and
+ * the fades overlap by a hair so one scene is always handing over to the
+ * next rather than the field going empty between them.
+ */
+const FIRST = 0.075
+const SPAN = 0.052
+
+export const PROJECTS: Project[] = WB_PROJECTS.flatMap((w, i) => {
+  if (!w.name) return []
+  const start = FIRST + i * SPAN
+  return [
+    {
+      id: w.id,
+      bigNum: String(w.displayOrder).padStart(2, '0'),
+      name: w.name.toUpperCase(),
+      category: w.category ?? '',
+      description: w.description,
+      impact: w.impact,
+      accent: PROJECT_ACCENTS[w.id] ?? PROJECT_ACCENTS['PRJ-01'],
+      shape: SHAPES[w.id] ?? FALLBACK_SHAPE,
+      reveal: REVEALS[i % REVEALS.length],
+      side: i % 2 === 0 ? 'left' : 'right',
+      window: [start, start + 0.013, start + 0.04, start + 0.052],
+    },
+  ]
+})
+
+/**
+ * Particle-shape morph schedule for the ambient field behind the scenes.
+ *
+ * The field is environment rather than illustration — it is one evolving
+ * system across the whole section, not a figure per project — so these
+ * spans are spread evenly across the chapter rather than pinned to
+ * individual projects. Everything stays a pure function of scroll
+ * progress, so reverse scrolling retraces the identical sequence.
  */
 export const MORPHS: MorphSpan[] = [
-  { a: 0.08, b: 0.145 }, /* constellations → 3G ring */
-  { a: 0.22, b: 0.285 }, /* ring → 5G waves */
-  { a: 0.36, b: 0.425 }, /* waves → coverage arcs */
-  { a: 0.5, b: 0.565 }, /* arcs → enterprise lattice */
-  { a: 0.64, b: 0.705 }, /* lattice → precision paths */
-  { a: 0.78, b: 0.845 }, /* paths → connected clusters */
-  { a: 0.9, b: 0.95 }, /* clusters → one convergence */
+  { a: 0.06, b: 0.115 },
+  { a: 0.155, b: 0.21 },
+  { a: 0.25, b: 0.305 },
+  { a: 0.345, b: 0.4 },
+  { a: 0.44, b: 0.495 },
+  { a: 0.535, b: 0.59 },
+  { a: 0.63, b: 0.685 },
+  { a: 0.725, b: 0.78 },
+  { a: 0.85, b: 0.925 },
 ]
 
 /** Ambient wobble amplitude per shape (indexed like the shapes). */
-export const SHAPE_AMPS = [0.1, 0.03, 0.07, 0.06, 0.022, 0.02, 0.045, 0.06]
+export const SHAPE_AMPS = [0.1, 0.03, 0.03, 0.07, 0.05, 0.042, 0.022, 0.016, 0.045, 0.06]

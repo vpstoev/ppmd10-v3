@@ -30,8 +30,8 @@ interface TimelineVisualProps {
 const SEGMENT_PALETTES: string[][] = [
   [TL_WHITE, TL_CHAMPAGNE],
   [TL_CHAMPAGNE, TL_WHITE, TL_CORAL],
-  [TL_CORAL, TL_WHITE],
-  [TL_VIOLET, TL_WHITE],
+  [TL_VIOLET, '#c9a7ff', TL_VIOLET],
+  [TL_VIOLET, '#d8c2ff', TL_VIOLET],
   [TL_VIOLET, TL_ICE],
   [TL_ICE, TL_WHITE],
   [TL_CORAL, TL_VIOLET],
@@ -88,7 +88,7 @@ function segmentColor(u: number): THREE.Color {
  */
 function TimePath({ containerRef, reducedMotion, isMobile }: TimelineVisualProps) {
   const invalidate = useThree((s) => s.invalidate)
-  const count = isMobile ? 3000 : 9000
+  const count = isMobile ? 3000 : 12000
   const glowCount = isMobile ? 200 : 500
   const strandCount = isMobile ? 70 : 160
   const matRef = useRef<THREE.PointsMaterial>(null)
@@ -204,11 +204,16 @@ function TimePath({ containerRef, reducedMotion, isMobile }: TimelineVisualProps
     const p = computeProgress(containerRef.current)
     const time = reducedMotion ? 0 : state.clock.elapsedTime
     const W = timelineWeights(p)
+    const focus2018 = smoothstep(0.22, 0.3, p) * (1 - smoothstep(0.46, 0.52, p))
 
     /* Constant deep-ink base + fog for depth (also hides the path's end). */
     if (!(state.scene.background instanceof THREE.Color)) {
       state.scene.background = inkColor.clone()
       state.scene.fog = new THREE.Fog(INK, 7, 26)
+    }
+    if (state.scene.fog instanceof THREE.Fog) {
+      state.scene.fog.near = lerp(7, 5.8, focus2018)
+      state.scene.fog.far = lerp(26, 24.5, focus2018)
     }
 
     const num = (key: keyof PathPhase) => {
@@ -248,17 +253,19 @@ function TimePath({ containerRef, reducedMotion, isMobile }: TimelineVisualProps
       const zSpan = isMobile ? 40 : 58
       const cz = 6 - travel * zSpan
       const uc = Math.min(1, Math.max(0, (4 - cz) / PATH_Z_LENGTH))
-      const cx = pathX(uc) * 0.85 + Math.sin(time * 0.14) * 0.08
-      const cy = pathY(uc) * 0.85 + 0.35 + Math.cos(time * 0.11) * 0.06
+      const focusShiftX = focus2018 * 0.72
+      const focusShiftY = focus2018 * -0.18
+      const cx = pathX(uc) * 0.85 + Math.sin(time * 0.14) * 0.08 - focusShiftX
+      const cy = pathY(uc) * 0.85 + 0.35 + Math.cos(time * 0.11) * 0.06 + focusShiftY
       cam.position.set(cx, cy, cz)
       const ua = Math.min(1, uc + 0.05)
-      cam.lookAt(pathX(ua), pathY(ua), pathZ(ua))
+      cam.lookAt(pathX(ua) - focusShiftX, pathY(ua) + focusShiftY, pathZ(ua))
       cam.rotation.z += Math.sin(time * 0.1) * 0.015
     }
 
     if (matRef.current) {
       /* Slightly quieter during the intro so the title reads first. */
-      matRef.current.opacity = lerp(0.75, 1, smoothstep(0.05, 0.14, p))
+      matRef.current.opacity = lerp(0.88, 1, smoothstep(0.05, 0.14, p))
     }
   })
 
@@ -268,7 +275,7 @@ function TimePath({ containerRef, reducedMotion, isMobile }: TimelineVisualProps
         <pointsMaterial
           ref={matRef}
           map={sprite}
-          size={isMobile ? 0.055 : 0.045}
+          size={isMobile ? 0.046 : 0.038}
           sizeAttenuation
           vertexColors
           transparent
@@ -279,16 +286,17 @@ function TimePath({ containerRef, reducedMotion, isMobile }: TimelineVisualProps
       <points geometry={glowGeometry} frustumCulled={false}>
         <pointsMaterial
           map={sprite}
-          size={0.7}
+          size={isMobile ? 0.28 : 0.14}
           sizeAttenuation
           vertexColors
           transparent
-          opacity={0.05}
+          opacity={0.12}
+          blending={THREE.AdditiveBlending}
           depthWrite={false}
         />
       </points>
       <lineSegments geometry={strandGeometry} frustumCulled={false}>
-        <lineBasicMaterial vertexColors transparent opacity={0.26} depthWrite={false} />
+        <lineBasicMaterial vertexColors transparent opacity={0.14} depthWrite={false} />
       </lineSegments>
     </>
   )

@@ -4,9 +4,17 @@
 export type RevealKind = 'mask' | 'clip' | 'depth'
 
 export interface TimelineMilestone {
+  /**
+   * Workbook id, and the React key.
+   *
+   * The year cannot be the key: several milestones share one. Three
+   * things happened in 2018 and two in 2023, which is a fact about the
+   * decade rather than a mistake in the sheet — so the identifier and the
+   * displayed date are two different values, and only one of them is
+   * unique.
+   */
+  id: string
   year: string
-  /** e.g. "01 / 06" */
-  num: string
   title: string
   description: string
   /** Dominant accent for this period (deep-ink base stays constant). */

@@ -11,6 +11,9 @@ import type { TimelineMilestone } from './ppmd-timeline/timelineTypes'
 import { computeProgress, fadeWindow, smoothstep } from './hg-hero/heroTheme'
 import s from './TenYearsInMotion.module.css'
 
+const MILESTONES_2018 = MILESTONES.filter((milestone) => milestone.year === '2018')
+const FIRST_2018_INDEX = MILESTONES.findIndex((milestone) => milestone.year === '2018')
+
 function detectWebGL(): boolean {
   try {
     const canvas = document.createElement('canvas')
@@ -45,7 +48,7 @@ function useReducedMotion(): boolean {
 export default function TenYearsInMotion() {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const reducedMotion = useReducedMotion()
-  const webgl = useMemo(detectWebGL, [])
+  const webgl = useMemo(() => detectWebGL(), [])
   const isMobile = useMemo(() => window.innerWidth < 768, [])
 
   if (!webgl) return <StaticFallback />
@@ -128,14 +131,83 @@ function TextLayer({ containerRef }: { containerRef: React.RefObject<HTMLDivElem
       </div>
 
       {/* Milestones — one spatial chapter at a time */}
-      {MILESTONES.map((m) => {
+      {MILESTONES.map((m, index) => {
+        if (m.year === '2018') {
+          if (index !== FIRST_2018_INDEX || MILESTONES_2018.length < 2) return null
+          const first = MILESTONES_2018[0]
+          const last = MILESTONES_2018[MILESTONES_2018.length - 1]
+          /* The paired chapter starts only after the preceding milestone
+             has fully left. That prevents the shared 2018 rail from
+             cross-fading on top of the 2017 copy. */
+          const pairEnterStart = first.window[1]
+          const pairEnterEnd = Math.min(first.window[2], pairEnterStart + 0.04)
+          const w = fadeWindow(
+            p,
+            pairEnterStart,
+            pairEnterEnd,
+            last.window[2],
+            last.window[3],
+          )
+          const enter = Math.min(1, w * 1.5)
+          const visible = w > 0.02
+
+          return (
+            <div
+              key="timeline-2018-pair"
+              className={`${s.milestone} ${s.yearPair2018}`}
+              style={{ visibility: visible ? undefined : 'hidden' }}
+            >
+              <span
+                className={s.bigYear}
+                aria-hidden="true"
+                style={{
+                  opacity: enter,
+                  color: '#9d6bff22',
+                  transform: `scale(${1.1 - 0.1 * enter}) translateY(${(1 - enter) * 26}px)`,
+                }}
+              >
+                2018
+              </span>
+              <div
+                className={s.yearPairRail}
+                style={{
+                  opacity: enter,
+                  transform: `translateX(${(1 - enter) * -24}px)`,
+                }}
+              >
+                <p className={s.yearPairEyebrow}>Timeline 2018</p>
+                <ol className={s.yearPairList}>
+                  {MILESTONES_2018.map((event) => (
+                    <li
+                      key={event.id}
+                      className={s.yearPairItem}
+                      style={{ ['--milestone-accent' as string]: event.accent }}
+                    >
+                      <span className={s.yearPairNode} aria-hidden="true" />
+                      <p className={s.yearPairMeta}>2018</p>
+                      <h3 className={s.yearPairTitle}>
+                        {event.title === 'INNOVATION, BUILT IN-HOUSE' ? (
+                          <>INNOVATION,<br />BUILT IN-HOUSE</>
+                        ) : event.title === 'FIRST BY NATURE .. A1 WAS BORN' ? (
+                          <>FIRST BY NATURE —<br />A1 WAS BORN</>
+                        ) : event.title}
+                      </h3>
+                      <p className={s.yearPairDescription}>{event.description}</p>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            </div>
+          )
+        }
+
         const w = fadeWindow(p, m.window[0], m.window[1], m.window[2], m.window[3])
         const enter = Math.min(1, w * 1.5)
         const visible = w > 0.02
         const yearScale = 1.14 - 0.14 * enter
         return (
           <div
-            key={m.year}
+            key={`${m.id}-${index}`}
             className={`${s.milestone} ${s[`m${m.layout}` as keyof typeof s]}`}
             style={{ visibility: visible ? undefined : 'hidden' }}
           >
@@ -145,12 +217,18 @@ function TextLayer({ containerRef }: { containerRef: React.RefObject<HTMLDivElem
               style={{
                 opacity: enter,
                 transform: `scale(${yearScale}) translateY(${(1 - enter) * 30}px)`,
-                ...(m.iridescent ? {} : { color: `${m.accent}2e` }),
+                ...(m.iridescent ? {} : { color: `${m.accent}52` }),
               }}
             >
               {m.year}
             </span>
-            <div className={s.content} style={{ opacity: m.reveal === 'mask' ? 1 : undefined }}>
+            <div
+              className={s.content}
+              style={{
+                opacity: m.reveal === 'mask' ? 1 : undefined,
+                ['--milestone-accent' as string]: m.accent,
+              }}
+            >
               <div
                 className={m.reveal === 'mask' ? s.maskWrap : undefined}
                 style={m.reveal === 'mask' ? { opacity: Math.min(1, w * 2) } : undefined}
@@ -164,8 +242,7 @@ function TextLayer({ containerRef }: { containerRef: React.RefObject<HTMLDivElem
                   className={s.contentInner}
                 >
                   <p className={s.meta} style={{ color: m.accent }}>
-                    <span className={s.metaYear}>{m.year}</span>
-                    {m.num}
+                    {m.year}
                   </p>
                   <h3 className={s.milestoneTitle}>{m.title}</h3>
                   <p className={s.description}>{m.description}</p>
@@ -206,23 +283,37 @@ function StaticFallback() {
         <h2 className={s.titleMain}>TEN YEARS IN MOTION</h2>
         <p className={s.titleYears}>2016&mdash;2026</p>
       </div>
-      {MILESTONES.map((m) => (
-        <div key={m.year} className={s.fbBlock}>
-          <span
-            className={m.iridescent ? `${s.fbYear} ${s.bigYearIridescent}` : s.fbYear}
-            aria-hidden="true"
-            style={m.iridescent ? {} : { color: `${m.accent}2e` }}
-          >
-            {m.year}
-          </span>
-          <p className={s.meta} style={{ color: m.accent }}>
-            <span className={s.metaYear}>{m.year}</span>
-            {m.num}
-          </p>
-          <h3 className={s.milestoneTitle}>{m.title}</h3>
-          <p className={s.description}>{m.description}</p>
-        </div>
-      ))}
+      {MILESTONES.map((m, index) => {
+        if (m.year === '2018') {
+          if (index !== FIRST_2018_INDEX) return null
+          return (
+            <div key="fallback-2018-pair" className={`${s.fbBlock} ${s.fbPair2018}`}>
+              <span className={s.fbYear} aria-hidden="true" style={{ color: '#9d6bff35' }}>2018</span>
+              {MILESTONES_2018.map((event) => (
+                <div key={event.id} className={s.fbPairEvent}>
+                  <p className={s.meta} style={{ color: event.accent }}>2018</p>
+                  <h3 className={s.milestoneTitle}>{event.title}</h3>
+                  <p className={s.description}>{event.description}</p>
+                </div>
+              ))}
+            </div>
+          )
+        }
+        return (
+          <div key={`${m.id}-${index}`} className={s.fbBlock}>
+            <span
+              className={m.iridescent ? `${s.fbYear} ${s.bigYearIridescent}` : s.fbYear}
+              aria-hidden="true"
+              style={m.iridescent ? {} : { color: `${m.accent}52` }}
+            >
+              {m.year}
+            </span>
+            <p className={s.meta} style={{ color: m.accent }}>{m.year}</p>
+            <h3 className={s.milestoneTitle}>{m.title}</h3>
+            <p className={s.description}>{m.description}</p>
+          </div>
+        )
+      })}
       <div className={`${s.fbBlock} ${s.fbClosing}`}>
         <h2 className={s.closingMain}>TEN YEARS SHAPED THE JOURNEY.</h2>
         <p className={s.closingNext}>The story continues through the work we deliver.</p>

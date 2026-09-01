@@ -1,5 +1,4 @@
-import HgInspiredHero from './HgInspiredHero.tsx'
-import WhatPpmdMakesPossible from './WhatPpmdMakesPossible.tsx'
+import ExperienceSection from './ppmd-experience/ExperienceSection.tsx'
 import TenYearsInMotion from './TenYearsInMotion.tsx'
 import ProjectsThatShapedTheDecade from './ProjectsThatShapedTheDecade.tsx'
 import TeamsAndPeople from './TeamsAndPeople.tsx'
@@ -10,21 +9,17 @@ import SectionNavigation from './SectionNavigation.tsx'
 import { siteConfig } from './siteConfig.ts'
 
 /**
- * The complete experimental anniversary experience. Section wrappers
- * carry the `ppmd-*` ids the navigation targets; the Projects section
- * renders only when enabled in siteConfig (both orders share the same
- * deep-ink handoff between Timeline and Teams & People, so no visual
+ * The complete experimental anniversary experience. Hero and Capabilities
+ * are ONE pinned scroll experience (ExperienceSection carries both the
+ * `ppmd-hero` and `ppmd-capabilities` navigation anchors); the Projects
+ * section renders only when enabled in siteConfig (both orders share the
+ * same deep-ink handoff between Timeline and Teams & People, so no visual
  * gap appears either way).
  */
 export default function ExperiencePage() {
   return (
     <>
-      <div id="ppmd-hero">
-        <HgInspiredHero />
-      </div>
-      <div id="ppmd-capabilities">
-        <WhatPpmdMakesPossible />
-      </div>
+      <ExperienceSection />
       <div id="ppmd-timeline">
         <TenYearsInMotion />
       </div>

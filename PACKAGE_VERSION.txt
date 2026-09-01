@@ -1,0 +1,13 @@
+PPMD 10th Anniversary website — current delivery package
+Build date: 2026-08-27
+Content: workbook import validated (33 people, 16 projects, 20 Voices)
+Build: TypeScript + Vite production build validated
+Latest motion pass: every People/Teams detail panel has a continuously
+travelling gradient perimeter that stays contained to the tile; Current Focus
+has an animated atmosphere; Voices overview has a subtle field composition;
+solar light includes a visible restrained star source and moving light pool;
+type reveal keeps a visible source rail and quicker line-level focus.
+
+Run from this folder on Windows PowerShell:
+  npm.cmd install
+  npm.cmd run dev -- --host 127.0.0.1 --port 5200

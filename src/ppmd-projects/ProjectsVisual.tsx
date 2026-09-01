@@ -114,33 +114,88 @@ function shapeConstellations(n: number): Shape {
   return { pos, col }
 }
 
-/** 01 — 3G Sunset: a large ring deactivates, energy exits as a path. */
-function shapeRing(n: number): Shape {
-  const pos = new Float32Array(n * 3)
-  const col = new Float32Array(n * 3)
-  const paint = makePicker([
-    [P_CHAMPAGNE, 2.2],
-    [P_CORAL, 1.6],
-    [P_WHITE, 1.2],
-  ])
-  const cx = 2.4
+/**
+ * 01 — 3G Sunset: a controlled network transition, as a PAIR of states
+ * morphed across the project's own plateau.
+ *
+ * Two large-scale lanes run the width of the frame and converge gently
+ * downstream: the legacy network above, the continuing environment below.
+ * Because the morph carries particle i from its A position to its B
+ * position, a particle seeded on the legacy lane in A and on the target
+ * lane in B *is* a migration — it changes lane while advancing downstream,
+ * so the movement reads as traffic being rerouted rather than deleted. The
+ * target lane is already populated in A and only strengthens, which is what
+ * keeps continuity visible for the whole scene.
+ */
+function shapeSunsetPair(n: number): [Shape, Shape] {
+  const A: Shape = { pos: new Float32Array(n * 3), col: new Float32Array(n * 3) }
+  const B: Shape = { pos: new Float32Array(n * 3), col: new Float32Array(n * 3) }
+  const legacy = hexToRgb(P_CORAL)
+  const legacyWarm = hexToRgb(P_CHAMPAGNE)
+  const target = hexToRgb(P_WHITE)
+  const ink = hexToRgb(INK)
+
+  /** Lane 0 = legacy (upper), lane 1 = continuing environment (lower). */
+  const laneX = (u: number) => -6.7 + u * 13.4
+  const laneY = (u: number, lane: number) => {
+    const converge = 1 - 0.38 * u /* the two lanes draw together downstream */
+    return (lane === 0 ? 1.72 : -1.5) * converge + Math.sin(u * 3.1 + lane * 1.7) * 0.22
+  }
+  const laneZ = (u: number, lane: number) =>
+    (lane === 0 ? 0.65 : -0.7) + Math.sin(u * 2.4 + lane * 2.1) * 0.45
+
+  const put = (s: Shape, i3: number, u: number, lane: number, spread: number) => {
+    s.pos[i3] = laneX(u) + gauss() * spread * 1.1
+    s.pos[i3 + 1] = laneY(u, lane) + gauss() * spread
+    s.pos[i3 + 2] = laneZ(u, lane) + gauss() * spread * 1.2
+  }
+  const tint = (s: Shape, i3: number, c: [number, number, number], k: number) => {
+    const b = 0.8 + Math.random() * 0.3
+    s.col[i3] = Math.min(1, c[0] * b) * k + ink[0] * (1 - k)
+    s.col[i3 + 1] = Math.min(1, c[1] * b) * k + ink[1] * (1 - k)
+    s.col[i3 + 2] = Math.min(1, c[2] * b) * k + ink[2] * (1 - k)
+  }
+
   for (let i = 0; i < n; i++) {
     const i3 = i * 3
-    if (i % 100 < 70) {
-      const a = Math.random() * Math.PI * 2
-      const r = 2.6 + gauss() * 0.18
-      pos[i3] = cx + Math.cos(a) * r
-      pos[i3 + 1] = Math.sin(a) * r * 0.82
-      pos[i3 + 2] = gauss() * 0.35
+    const role = i % 100
+    const u = Math.random()
+    // Downstream advance across the scene — every particle keeps flowing,
+    // so nothing appears to stall while the migration happens.
+    const uB = Math.min(1, u + 0.16 + Math.random() * 0.1)
+    if (role < 34) {
+      /* the continuing environment: present from the start, and it tightens */
+      put(A, i3, u, 1, 0.13)
+      put(B, i3, uB, 1, 0.1)
+      tint(A, i3, target, 0.85)
+      tint(B, i3, target, 1)
+    } else if (role < 82) {
+      /* migrating traffic: legacy lane → continuing lane, still moving */
+      put(A, i3, u, 0, 0.12)
+      put(B, i3, uB, 1, 0.13)
+      tint(A, i3, legacy, 0.95)
+      tint(B, i3, target, 0.92)
+    } else if (role < 93) {
+      /* residual legacy: thinning and dimming toward the ink, never popping */
+      put(A, i3, u, 0, 0.13)
+      put(B, i3, Math.min(1, u + 0.05), 0, 0.42)
+      tint(A, i3, legacyWarm, 0.9)
+      tint(B, i3, legacyWarm, 0.18)
     } else {
-      const t = Math.random()
-      pos[i3] = cx + 2.3 + t * 5.4 + gauss() * 0.2
-      pos[i3 + 1] = -0.4 - t * 1.3 + gauss() * 0.18
-      pos[i3 + 2] = t * 2.6 + gauss() * 0.2
+      /* slow cross-lane connectors that make the reroute legible */
+      const mix = Math.random()
+      A.pos[i3] = laneX(u) + gauss() * 0.16
+      A.pos[i3 + 1] = laneY(u, 0) * (1 - mix) + laneY(u, 1) * mix + gauss() * 0.14
+      A.pos[i3 + 2] = laneZ(u, 0) * (1 - mix) + laneZ(u, 1) * mix + gauss() * 0.2
+      const m2 = Math.min(1, mix + 0.45)
+      B.pos[i3] = laneX(uB) + gauss() * 0.14
+      B.pos[i3 + 1] = laneY(uB, 0) * (1 - m2) + laneY(uB, 1) * m2 + gauss() * 0.12
+      B.pos[i3 + 2] = laneZ(uB, 0) * (1 - m2) + laneZ(uB, 1) * m2 + gauss() * 0.18
+      tint(A, i3, legacyWarm, 0.9)
+      tint(B, i3, target, 0.95)
     }
-    paint(col, i3)
   }
-  return { pos, col }
+  return [A, B]
 }
 
 /** 02 — 5G: layered high-speed waves with scale and depth. */
@@ -164,32 +219,76 @@ function shapeWaves(n: number): Shape {
   return { pos, col }
 }
 
-/** 03 — Voice over Wi-Fi: soft ripple arcs connecting across space. */
-function shapeArcs(n: number): Shape {
-  const pos = new Float32Array(n * 3)
-  const col = new Float32Array(n * 3)
-  const paint = makePicker([
-    [P_ICE, 2.6],
-    [P_WHITE, 1.8],
-    [P_VIOLET, 0.5],
-  ])
-  const centers = [
-    [3.2, 1.4, -0.5],
-    [-0.6, -2.0, 0.4],
-    [1.4, 0.2, -1.6],
+/**
+ * 03 — Voice over Wi-Fi: two networks becoming one experience, again as a
+ * PAIR morphed across the project's own plateau.
+ *
+ * State A holds two distinct systems, separated in depth and tone — one
+ * sitting forward, one behind, each on its own band of lanes. State B puts
+ * both on a single shared band and gives them opposite weave phases, so
+ * they cross through each other in depth and resolve into one continuous
+ * braided flow. The handover reads as interleaving, never as one system
+ * replacing the other.
+ */
+function shapeVowifiPair(n: number): [Shape, Shape] {
+  const A: Shape = { pos: new Float32Array(n * 3), col: new Float32Array(n * 3) }
+  const B: Shape = { pos: new Float32Array(n * 3), col: new Float32Array(n * 3) }
+  const netA = hexToRgb(P_ICE)
+  const netB = hexToRgb(P_WHITE)
+  const seam = hexToRgb(P_VIOLET)
+
+  const spanX = (u: number) => -6.6 + u * 13.2
+  /* A: each network on its own band, its own depth. */
+  const sepY = (u: number, net: number, lane: number) =>
+    (net === 0 ? 1.75 : -1.7) + (lane - 1) * 0.5 + Math.sin(u * 2.7 + net * 1.4 + lane) * 0.3
+  const sepZ = (net: number) => (net === 0 ? 1.3 : -1.65)
+  /* B: one shared band, the two networks weaving in opposite phase. */
+  const oneY = (u: number, lane: number) =>
+    (lane - 1) * 0.62 + Math.sin(u * 3.4 + lane * 0.9) * 0.5
+  const oneZ = (u: number, net: number) => Math.sin(u * Math.PI * 3 + net * Math.PI) * 0.62
+
+  const tint = (s: Shape, i3: number, c: [number, number, number]) => {
+    const b = 0.8 + Math.random() * 0.3
+    s.col[i3] = Math.min(1, c[0] * b)
+    s.col[i3 + 1] = Math.min(1, c[1] * b)
+    s.col[i3 + 2] = Math.min(1, c[2] * b)
+  }
+  /* The unified tone both networks resolve toward. */
+  const merged: [number, number, number] = [
+    (netA[0] + netB[0]) / 2,
+    (netA[1] + netB[1]) / 2,
+    (netA[2] + netB[2]) / 2,
   ]
-  const radii = [1.4, 2.4, 3.4]
+
   for (let i = 0; i < n; i++) {
     const i3 = i * 3
-    const c = centers[i % 3]
-    const r = radii[(i / 3) % 3 | 0] + gauss() * 0.12
-    const a = Math.random() * Math.PI * 2
-    pos[i3] = c[0] + Math.cos(a) * r
-    pos[i3 + 1] = c[1] + Math.sin(a) * r * 0.8
-    pos[i3 + 2] = c[2] + gauss() * 0.3
-    paint(col, i3)
+    const net = i % 2
+    const lane = (i / 2) % 3 | 0
+    const u = Math.random()
+    const uB = Math.min(1, u + 0.12 + Math.random() * 0.08)
+    const isSeam = i % 100 >= 88 /* the flows that visibly cross between systems */
+
+    A.pos[i3] = spanX(u) + gauss() * 0.22
+    A.pos[i3 + 1] = sepY(u, net, lane) + gauss() * 0.16
+    A.pos[i3 + 2] = sepZ(net) + gauss() * 0.3
+
+    B.pos[i3] = spanX(uB) + gauss() * 0.2
+    B.pos[i3 + 1] = oneY(uB, lane) + gauss() * 0.14
+    B.pos[i3 + 2] = oneZ(uB, net) + gauss() * 0.22
+
+    if (isSeam) {
+      // Seam particles start between the two systems and end inside the
+      // braid, so the crossing is legible before the bands have merged.
+      A.pos[i3 + 1] = (sepY(u, 0, lane) + sepY(u, 1, lane)) * 0.5 + gauss() * 0.5
+      A.pos[i3 + 2] = gauss() * 0.5
+      tint(A, i3, seam)
+      tint(B, i3, merged)
+    } else {
+      tint(A, i3, net === 0 ? netA : netB)
+      tint(B, i3, merged)
+    }
   }
-  return { pos, col }
+  return [A, B]
 }
 
 /** 04 — SAP S/4HANA: layers align into an ordered spatial structure. */
@@ -229,8 +328,18 @@ function shapeLattice(n: number): Shape {
   return { pos, col }
 }
 
-/** 05 — Customs: precise paths through one controlled central gate. */
-function shapePaths(n: number): Shape {
+/**
+ * 05 — Bulgarian Customs Agency: structured, controlled data flow.
+ *
+ * Strictly directional, left to right — there is no radial symmetry
+ * anywhere in the figure, which is what keeps it from reading as a
+ * starburst. Four declared lanes enter and converge on a validation zone
+ * where positions quantize onto discrete ranks and columns (engineered, not
+ * organic), then the traffic branches out to three separate destination
+ * paths. Scatter is deliberately the tightest of any project shape so the
+ * whole system reads as precise and accountable.
+ */
+function shapeLanes(n: number): Shape {
   const pos = new Float32Array(n * 3)
   const col = new Float32Array(n * 3)
   const paint = makePicker([
@@ -238,26 +347,57 @@ function shapePaths(n: number): Shape {
     [P_WHITE, 2],
     [P_CORAL, 0.9],
   ])
-  const cx = 1.9
+  const GATE_L = -1.5
+  const GATE_R = 1.5
+  const inLanes = [-2.15, -0.72, 0.72, 2.15]
+  const outPaths = [-2.45, 0.15, 2.6]
+  /* Discrete ranks/columns inside the validation zone. */
+  const ranks = [-0.9, -0.54, -0.18, 0.18, 0.54, 0.9]
+  const cols = [-0.95, 0, 0.95]
+
   for (let i = 0; i < n; i++) {
     const i3 = i * 3
-    if (i % 100 < 82) {
-      const k = i % 5
-      const th = (k / 5) * Math.PI * 2 + 0.3
-      const dx = Math.cos(th)
-      const dy = Math.sin(th) * 0.7
-      const t = Math.random() * 2 - 1 /* -1..1 through the centre */
-      const bend = Math.sin((t + 1) * Math.PI * 0.5) * 0.45 * (k % 2 ? 1 : -1)
-      pos[i3] = cx + dx * t * 7.5 - dy * bend + gauss() * 0.07
-      pos[i3 + 1] = dy * t * 7.5 + dx * bend * 0.7 + gauss() * 0.07
-      pos[i3 + 2] = (k - 2) * 0.35 + gauss() * 0.28
+    const stage = i % 100
+    if (stage < 38) {
+      /* inbound: declared lanes, converging on the gate */
+      const k = i % 4
+      const u = Math.random()
+      const x = -7.4 + u * (GATE_L + 7.4)
+      const conv = 1 - 0.62 * u
+      pos[i3] = x + gauss() * 0.05
+      pos[i3 + 1] = inLanes[k] * conv + gauss() * 0.055
+      pos[i3 + 2] = (k - 1.5) * 0.42 + gauss() * 0.12
+    } else if (stage < 62) {
+      /* validation zone: traffic aligns onto discrete ranks and holds them
+         across the whole zone — ordered lanes under inspection, not a grid
+         of blocks. A minority marks the checkpoint columns those ranks
+         cross, which is what makes the zone read as a control point. */
+      const r = ranks[i % 6]
+      if (stage < 58) {
+        pos[i3] = GATE_L + Math.random() * (GATE_R - GATE_L) + gauss() * 0.03
+        pos[i3 + 1] = r + gauss() * 0.045
+        pos[i3 + 2] = ((i % 5) - 2) * 0.3 + gauss() * 0.06
+      } else {
+        const c = cols[(i / 6) % 3 | 0]
+        pos[i3] = c + gauss() * 0.035
+        pos[i3 + 1] = (Math.random() * 2 - 1) * 1.05 + gauss() * 0.04
+        pos[i3 + 2] = ((i % 5) - 2) * 0.3 + gauss() * 0.06
+      }
+    } else if (stage < 94) {
+      /* outbound: branching to separate, connected destinations */
+      const d = i % 3
+      const u = Math.random()
+      const x = GATE_R + u * (7.4 - GATE_R)
+      const spread = smoothstep(0, 1, u)
+      pos[i3] = x + gauss() * 0.05
+      pos[i3 + 1] = outPaths[d] * spread + gauss() * 0.055
+      pos[i3 + 2] = (d - 1) * 0.55 * spread + gauss() * 0.12
     } else {
-      /* the central gate */
-      const a = Math.random() * Math.PI * 2
-      const r = 0.9 + gauss() * 0.07
-      pos[i3] = cx + Math.cos(a) * r
-      pos[i3 + 1] = Math.sin(a) * r * 0.9
-      pos[i3 + 2] = gauss() * 0.2
+      /* sparse structural markers holding the lanes apart in depth */
+      const k = i % 4
+      pos[i3] = -7 + Math.random() * 14
+      pos[i3 + 1] = inLanes[k] * 1.32 + gauss() * 0.1
+      pos[i3 + 2] = -1.5 + gauss() * 0.5
     }
     paint(col, i3)
   }
@@ -347,13 +487,20 @@ function ProjectField({ containerRef, reducedMotion, isMobile }: ProjectsVisualP
   const strandsRef = useRef<THREE.LineSegments>(null)
 
   const shapes = useMemo<Shape[]>(() => {
+    // Two projects carry a pair of states morphed across their own plateau;
+    // the shape list stays one entry longer than MORPHS, as the lookup in
+    // the frame loop expects.
+    const [sunsetA, sunsetB] = shapeSunsetPair(count)
+    const [vowifiA, vowifiB] = shapeVowifiPair(count)
     return [
       shapeConstellations(count),
-      shapeRing(count),
+      sunsetA,
+      sunsetB,
       shapeWaves(count),
-      shapeArcs(count),
+      vowifiA,
+      vowifiB,
       shapeLattice(count),
-      shapePaths(count),
+      shapeLanes(count),
       shapeClusters(count),
       shapeConvergence(count),
     ]

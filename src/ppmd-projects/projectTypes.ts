@@ -1,20 +1,28 @@
 /** Types for the "Projects that Shaped the Decade" section. */
+import type { ProjectAccent } from './projectAccents'
+import type { ShapePlacement } from './ProjectShape'
 
 export type RevealKind = 'mask' | 'clip' | 'depth'
 
 export interface Project {
-  /** e.g. "01 / 06" */
-  num: string
-  /** Environmental numeral, e.g. "01" */
+  /** Workbook id — the React key, and what the accent and shape tables
+   *  are looked up by. */
+  id: string
+  /** Environmental numeral, e.g. "01". */
   bigNum: string
   name: string
   category: string
-  description: string
-  impact: string
-  /** Dominant text accent for this project. */
-  accent: string
-  /** The final programme renders its numeral with the full gradient. */
-  iridescent?: boolean
+  /**
+   * Optional throughout, and deliberately so. The importer omits empty or
+   * confirmed template-filler cells, while preserving reviewed copy when it
+   * is present in the workbook.
+   */
+  description?: string
+  impact?: string
+  /** Colour treatment for this project — see `projectAccents`. */
+  accent: ProjectAccent
+  /** The abstract figure behind the scene, and how it is cropped. */
+  shape: ShapePlacement
   reveal: RevealKind
   /** Editorial side for the text block. */
   side: 'left' | 'right'

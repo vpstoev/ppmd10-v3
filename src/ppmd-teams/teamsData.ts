@@ -1,9 +1,17 @@
 /**
  * Teams & People — content and scroll choreography.
- * Team copy is PLACEHOLDER; the fact values are explicitly TBD and must
- * not be presented as verified numbers. Team sizes and leadership
- * structure come from peopleData (authoritative).
+ *
+ * Headlines, descriptions and distinctive facts come from the content
+ * workbook. Team sizes and leadership structure come from peopleData,
+ * which is authoritative for both.
+ *
+ * The three evidence figures each team can carry are still `TBD` in the
+ * workbook, so the importer withholds them and the chapters render
+ * without a figures block rather than printing "TBD" three times under a
+ * team's name. When real numbers are entered, they appear on the next
+ * import with no code change.
  */
+import { WB_TEAMS } from '../ppmd-content/workbookContent'
 import { fadeWindow, smoothstep } from '../hg-hero/heroTheme'
 import type { FieldPhase } from '../ppmd-shared/StreamField'
 import type { Team } from './teamTypes'
@@ -12,62 +20,76 @@ import type { Team } from './teamTypes'
    BPT 200 + closing 120 ≈ 1700vh */
 export const TEAMS_VH = 1700
 
-export const TEAMS: Team[] = [
+/**
+ * Everything about a team chapter that the workbook does not carry: where
+ * it sits in the scroll, what colour it is lit in, how many leadership
+ * functions to expect, and the one supporting line the roster field
+ * itself needs — which describes the composition on screen rather than
+ * the team, and so has no column in a content workbook.
+ */
+const CHAPTERS: Record<
+  string,
   {
+    id: string
+    shortName: string
+    rosterLede: string
+    accent: string
+    leadershipCount: number
+    window: readonly [number, number, number, number]
+  }
+> = {
+  PM: {
     id: 'pm',
-    num: '01',
-    name: 'PROJECT MANAGEMENT',
-    rosterTitle: 'PROJECT MANAGEMENT TEAM',
-    headline: 'COORDINATING COMPLEX DELIVERY',
-    description: 'Connecting people, priorities and decisions across complex initiatives.', /* PLACEHOLDER */
-    accent: '#ff6e79', /* coral rose */
-    facts: [
-      /* TBD values — do not present as verified numbers */
-      { value: 'TBD', label: 'Projects delivered' },
-      { value: 'TBD', label: 'Professional certifications' },
-      { value: 'TBD', label: 'Years of combined experience' },
-    ],
-    distinctiveFact: 'From strategic programmes to customer-facing delivery.', /* PLACEHOLDER */
+    shortName: 'PROJECT MANAGEMENT',
+    rosterLede: 'A connected delivery system powered by people, coordination and shared direction.',
+    accent: '#ff6e79' /* coral rose */,
     leadershipCount: 3,
     window: [0.2, 0.222, 0.265, 0.287],
   },
-  {
+  PROCESSES: {
     id: 'pp',
-    num: '02',
-    name: 'PROCESS & PROCEDURES',
-    rosterTitle: 'PROCESS & PROCEDURES MANAGEMENT TEAM',
-    headline: 'DESIGNING HOW WORK FLOWS',
-    description: 'Creating clearer, more consistent and scalable ways of working.', /* PLACEHOLDER */
-    accent: '#e8c188', /* champagne */
-    facts: [
-      /* TBD values — do not present as verified numbers */
-      { value: 'TBD', label: 'Processes improved' },
-      { value: 'TBD', label: 'Procedures managed' },
-      { value: 'TBD', label: 'Years of combined experience' },
-    ],
-    distinctiveFact: 'Turning complexity into repeatable ways of working.', /* PLACEHOLDER */
+    shortName: 'PROCESS & PROCEDURES',
+    rosterLede: 'Creating clearer, more consistent and scalable ways of working.',
+    accent: '#e8c188' /* champagne */,
     leadershipCount: 1,
     window: [0.276, 0.298, 0.341, 0.363],
   },
-  {
+  BPT: {
     id: 'bpt',
-    num: '03',
-    name: 'BPT & TESTING',
-    rosterTitle: 'BPT & TESTING TEAM',
-    headline: 'BUILDING CONFIDENCE IN CHANGE',
-    description: 'Validating processes and solutions before they reach the customer.', /* PLACEHOLDER */
-    accent: '#7cc4ff', /* ice blue */
-    facts: [
-      /* TBD values — do not present as verified numbers */
-      { value: 'TBD', label: 'Deliveries validated' },
-      { value: 'TBD', label: 'Testing cycles' },
-      { value: 'TBD', label: 'Years of combined experience' },
-    ],
-    distinctiveFact: 'Finding issues before they become customer issues.', /* PLACEHOLDER */
+    shortName: 'BPT & TESTING',
+    rosterLede: 'Validating processes and solutions before they reach the customer.',
+    accent: '#7cc4ff' /* ice blue */,
     leadershipCount: 1,
     window: [0.352, 0.374, 0.417, 0.439],
   },
-]
+}
+
+export const TEAMS: Team[] = WB_TEAMS.flatMap((w) => {
+  const chapter = CHAPTERS[w.id]
+  if (!chapter) return []
+  return [
+    {
+      id: chapter.id,
+      /* The workbook's display order, kept for sequencing and for keys.
+         It is not rendered: the eyebrow carries the team's name and its
+         accent, and nothing else. */
+      num: String(w.displayOrder).padStart(2, '0'),
+      name: chapter.shortName,
+      rosterTitle: (w.name ?? chapter.shortName).toUpperCase(),
+      rosterLede: chapter.rosterLede,
+      headline: w.headline ?? '',
+      description: w.description ?? '',
+      accent: chapter.accent,
+      /* Empty until the workbook holds real figures — see the note above. */
+      facts: w.facts.flatMap((f) =>
+        f.value && f.label ? [{ value: f.value, label: f.label }] : [],
+      ),
+      distinctiveFact: w.distinctiveFact ?? '',
+      leadershipCount: chapter.leadershipCount,
+      window: chapter.window,
+    },
+  ]
+})
 
 /* Person.team values, in section order — must match peopleData records. */
 export const TEAM_NAMES = ['Project Management', 'Process & Procedures', 'BPT & Testing']
@@ -89,6 +111,12 @@ export const MEMBERS_IN: ReadonlyArray<readonly [number, number]> = [
   [0.655, 0.7],
   [0.795, 0.838],
 ]
+
+/** A short, explicit People chapter between the team stories and the
+ * rosters. Keeping this as its own beat makes the section discoverable in
+ * the long pinned sequence instead of making the portraits feel like they
+ * appeared without an editorial handoff. */
+export const PEOPLE_INTRO_WINDOW: readonly [number, number, number, number] = [0.4, 0.415, 0.445, 0.465]
 
 export const TEAMS_CLOSE1_IN: readonly [number, number] = [0.895, 0.925]
 export const TEAMS_CLOSE2_IN: readonly [number, number] = [0.92, 0.95]
@@ -113,10 +141,49 @@ export const TEAMS_PHASES: FieldPhase[] = [
   { sep: 1.4, amp: 0.7, f1: 2.2, chaos: 0.03, spread: 0.12, align: 0.9, pull: 0, flow: 0.8, op: [0.15, 1, 0.12, 0.15] },
   /* 5 BPT chapter — ice + violet validation */
   { sep: 1.4, amp: 0.6, f1: 1.4, chaos: 0.15, spread: 0.14, align: 0.55, pull: 0, flow: 0.9, op: [0.12, 0.12, 1, 0.75] },
-  /* 6–8 calm connective backdrop behind each roster */
-  { sep: 1.1, amp: 0.5, f1: 1.0, chaos: 0.3, spread: 0.45, align: 0.2, pull: 0, flow: 0.3, op: [0.45, 0.06, 0.06, 0.08] },
-  { sep: 1.1, amp: 0.5, f1: 1.0, chaos: 0.3, spread: 0.45, align: 0.2, pull: 0, flow: 0.3, op: [0.06, 0.45, 0.06, 0.08] },
-  { sep: 1.1, amp: 0.5, f1: 1.0, chaos: 0.3, spread: 0.45, align: 0.2, pull: 0, flow: 0.3, op: [0.06, 0.06, 0.45, 0.25] },
+  /* 6–8 — one ambient system per roster, each expressing what that team
+     does. Every shared value below (sep, amp, spread, flow, and the whole
+     opacity set) is deliberately IDENTICAL across the three: coverage,
+     density, motion speed and contrast are held equal so no team reads as
+     the showcase. Only the behaviour flag differs, so the difference is
+     entirely one of system behaviour rather than of graphic style.
+     The team's own colour leads at 0.85; the other three sit near 0.30 as
+     connective material — enough to build the structure across the whole
+     frame, never enough to compete with the portraits in front of it. */
+  /* 6 PM roster — orchestration: coordinated trajectories + milestones.
+     Two clear zones: the leadership rank, and the wider member block whose
+     role labels and bios the coral flow used to cut straight through. */
+  {
+    sep: 1.1, amp: 0.5, f1: 1.0, chaos: 0.3, spread: 0.45, align: 0.2, pull: 0, flow: 0.3,
+    orchestration: 1, op: [0.85, 0.3, 0.28, 0.3],
+    /* One zone per rank rather than a single slab: the gaps between the
+       leadership row and the two member rows stay open, so the trajectory
+       structure still reads through the composition instead of the whole
+       lower frame going dark. */
+    clear: [
+      { x: 0, y: 1.95, rx: 2.9, ry: 1.2, s: 0.74 },
+      { x: 0, y: -1.15, rx: 5.1, ry: 1.1, s: 0.82 },
+      { x: -0.15, y: -3.0, rx: 4.2, ry: 1.05, s: 0.82 },
+    ],
+  },
+  /* 7 P&P roster — flow architecture: complexity resolving into lanes */
+  {
+    sep: 1.1, amp: 0.5, f1: 1.0, chaos: 0.3, spread: 0.45, align: 0.2, pull: 0, flow: 0.3,
+    structure: 1, op: [0.3, 0.85, 0.28, 0.3],
+    clear: [
+      { x: -4.1, y: -0.3, rx: 1.35, ry: 1.6, s: 0.8 },
+      { x: 1.1, y: -0.5, rx: 4.4, ry: 2.7, s: 0.88 },
+    ],
+  },
+  /* 8 BPT roster — validation field: a matrix under a slow sweep */
+  {
+    sep: 1.1, amp: 0.5, f1: 1.0, chaos: 0.3, spread: 0.45, align: 0.2, pull: 0, flow: 0.3,
+    validation: 1, op: [0.3, 0.28, 0.85, 0.3],
+    clear: [
+      { x: -2.75, y: -0.3, rx: 1.4, ry: 1.65, s: 0.8 },
+      { x: 1.1, y: -0.5, rx: 3.0, ry: 2.6, s: 0.88 },
+    ],
+  },
   /* 9 closing — one department */
   { sep: 0.5, amp: 0.5, f1: 1.0, chaos: 0.15, spread: 0.2, align: 0.4, pull: 0.75, flow: 0.6, op: [0.9, 0.9, 0.9, 0.9] },
 ]

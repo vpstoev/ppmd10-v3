@@ -12,6 +12,8 @@ dist
 dist-ssr
 build
 *.local
+*.xlsm
+.claude/settings.local.json
 
 # Build / tooling cache
 *.tsbuildinfo

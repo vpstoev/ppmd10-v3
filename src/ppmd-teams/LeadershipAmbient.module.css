@@ -1,0 +1,79 @@
+/* Ambient field behind a leadership chapter. Sits under the portrait and
+   the statement and is masked away from them: the reading column keeps a
+   clean ground, and the field takes the half of the screen that was
+   previously empty. */
+
+.ambient {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  /* The portrait and statement occupy roughly the left half at every
+     desktop width, so the field only reaches full strength past it. */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.22) 34%,
+    #000 58%,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.22) 34%,
+    #000 58%,
+    #000 100%
+  );
+}
+
+/* Very restrained radial depth — a suggestion of volume, no disc edge. */
+.depth {
+  position: absolute;
+  inset: -12%;
+  transition: opacity 0.4s ease;
+}
+
+/* The composition is seated in the empty right-hand area rather than
+   across the whole scene, and overflows its own box on every side so the
+   large contours enter and leave the frame instead of terminating in it.
+   NOTE: the two chapters differ through the composition maths, not by
+   flipping this container — mirroring the layer would drop the
+   Department Head's field straight behind its own text. */
+.field {
+  position: absolute;
+  left: 52%;
+  right: -12%;
+  top: -18%;
+  bottom: -18%;
+  width: auto;
+  height: auto;
+  overflow: visible;
+}
+
+/* Department Head: the same field framed a little differently, so the two
+   chapters read as a pair rather than as a repeat. */
+.ambientAlt .field {
+  left: 47%;
+  right: -16%;
+  top: -24%;
+  bottom: -12%;
+}
+
+/* Phones have no empty half to fill: the composition is a single column
+   there, so the field spans the width and fades out behind the text. */
+@media (max-width: 640px) {
+  .ambient,
+  .ambientAlt {
+    opacity: 0.5;
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 30%, transparent 68%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 30%, transparent 68%);
+  }
+  .field,
+  .ambientAlt .field {
+    left: -10%;
+    right: -10%;
+    top: -22%;
+    bottom: -8%;
+  }
+}

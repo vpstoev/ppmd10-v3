@@ -1,50 +1,46 @@
 /**
- * PLACEHOLDER CONTENT — Current Focus section.
- * All copy is temporary and centralized for later replacement.
+ * Current Focus — the five future-facing areas.
+ *
+ * Titles and supporting lines come from the content workbook. The accents
+ * and the scroll windows stay here: they are the order and the colour the
+ * chapter travels through, tuned against the field animation behind it
+ * rather than described per area in a content sheet.
  */
+import { WB_FOCUS } from '../ppmd-content/workbookContent'
 import { fadeWindow, smoothstep } from '../hg-hero/heroTheme'
 import type { FieldPhase } from '../ppmd-shared/StreamField'
 import type { FocusArea } from './focusTypes'
 
 export const FOCUS_VH = 520
 
-export const FOCUS_AREAS: FocusArea[] = [
-  {
-    num: '01',
-    name: 'AI & AUTOMATION',
-    line: 'Exploring smarter ways to support delivery and decision-making.', /* PLACEHOLDER */
-    accent: '#9d6bff',
-    window: [0.1, 0.15, 0.22, 0.27],
-  },
-  {
-    num: '02',
-    name: 'MODERNISATION',
-    line: 'Evolving systems, platforms and ways of working.', /* PLACEHOLDER */
-    accent: '#7cc4ff',
-    window: [0.24, 0.29, 0.36, 0.41],
-  },
-  {
-    num: '03',
-    name: 'CUSTOMER EXPERIENCE',
-    line: 'Connecting delivery decisions to real customer outcomes.', /* PLACEHOLDER */
-    accent: '#ff6e79',
-    window: [0.38, 0.43, 0.5, 0.55],
-  },
-  {
-    num: '04',
-    name: 'PROCESS OPTIMISATION',
-    line: 'Removing friction and creating clearer flows.', /* PLACEHOLDER */
-    accent: '#e8c188',
-    window: [0.52, 0.57, 0.64, 0.69],
-  },
-  {
-    num: '05',
-    name: 'QUALITY EVOLUTION',
-    line: 'Strengthening confidence across change and delivery.', /* PLACEHOLDER */
-    accent: '#c490d9',
-    window: [0.66, 0.71, 0.78, 0.83],
-  },
+/** Accent and scroll window per position in the sequence. */
+const SCENES: ReadonlyArray<{
+  accent: string
+  window: readonly [number, number, number, number]
+}> = [
+  { accent: '#9d6bff', window: [0.1, 0.15, 0.22, 0.27] },
+  { accent: '#7cc4ff', window: [0.24, 0.29, 0.36, 0.41] },
+  { accent: '#ff6e79', window: [0.38, 0.43, 0.5, 0.55] },
+  { accent: '#e8c188', window: [0.52, 0.57, 0.64, 0.69] },
+  { accent: '#c490d9', window: [0.66, 0.71, 0.78, 0.83] },
 ]
+
+export const FOCUS_AREAS: FocusArea[] = WB_FOCUS.slice(0, SCENES.length).flatMap((w, i) =>
+  w.title
+    ? [
+        {
+          /* Sequence position, kept for ordering and for React keys. The
+             large ghost numeral behind each block is drawn from the
+             stylesheet; this value is never printed as a label. */
+          num: String(w.displayOrder).padStart(2, '0'),
+          name: w.title,
+          line: w.line ?? '',
+          accent: SCENES[i].accent,
+          window: SCENES[i].window,
+        },
+      ]
+    : [],
+)
 
 export const FOCUS_TITLE_OUT: readonly [number, number] = [0.07, 0.11]
 export const FOCUS_CLOSE_IN: readonly [number, number] = [0.85, 0.92]
