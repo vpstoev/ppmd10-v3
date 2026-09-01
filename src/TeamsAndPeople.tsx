@@ -291,20 +291,30 @@ export default function TeamsAndPeople() {
                       )
                       return (
                         <p
-                          key={fact.label}
-                          className={fi === 0 ? `${s.fact} ${s.factMain}` : s.fact}
+                          key={`${fact.value}-${fi}`}
+                          className={!fact.label ? `${s.fact} ${s.factBullet}` : s.fact}
                           style={{
                             opacity: factO * enter,
                             transform: `translateX(${(1 - factO) * 18}px)`,
                           }}
                         >
+                          {!fact.label && (
+                            <span
+                              className={s.factDot}
+                              style={{
+                                background: team.accent,
+                                boxShadow: `0 0 16px ${team.accent}8f`,
+                              }}
+                              aria-hidden="true"
+                            />
+                          )}
                           <span
                             className={s.factValue}
-                            style={fi === 0 ? { color: team.accent } : undefined}
+                            style={!fact.label ? { color: team.accent } : undefined}
                           >
                             {fact.value}
                           </span>
-                          <span className={s.factLabel}>{fact.label}</span>
+                          {fact.label && <span className={s.factLabel}>{fact.label}</span>}
                         </p>
                       )
                     })}

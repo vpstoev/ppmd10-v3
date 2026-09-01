@@ -80,10 +80,20 @@ export const TEAMS: Team[] = WB_TEAMS.flatMap((w) => {
       headline: w.headline ?? '',
       description: w.description ?? '',
       accent: chapter.accent,
-      /* Empty until the workbook holds real figures — see the note above. */
-      facts: w.facts.flatMap((f) =>
-        f.value && f.label ? [{ value: f.value, label: f.label }] : [],
-      ),
+      facts: w.id === 'PM'
+        ? [
+            { value: '300 successful projects' },
+            { value: '64 ongoing projects' },
+            { value: '21 largest ICT customers overseen' },
+            ...w.facts.flatMap((f) =>
+              f.label === 'YEARS OF COMBINED EXPERIENCE' && f.value
+                ? [{ value: f.value, label: f.label }]
+                : [],
+            ),
+          ]
+        : w.facts.flatMap((f) =>
+            f.value && f.label ? [{ value: f.value, label: f.label }] : [],
+          ),
       distinctiveFact: w.distinctiveFact ?? '',
       leadershipCount: chapter.leadershipCount,
       window: chapter.window,

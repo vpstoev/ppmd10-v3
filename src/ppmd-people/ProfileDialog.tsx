@@ -118,7 +118,7 @@ export function ProfileDialog({ profile, onClose }: ProfileDialogProps) {
           .join(' ')}
         style={{
           ['--panel-accent' as string]: profile.accent,
-          ['--detail-role-accent' as string]: '#76d9ff',
+          ['--detail-role-accent' as string]: isLeadership ? '#76d9ff' : profile.accent,
         }}
         onClick={(e) => e.stopPropagation()}
       >

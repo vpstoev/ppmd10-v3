@@ -229,7 +229,7 @@
   left: clamp(24px, 7vw, 130px);
   top: 50%;
   translate: 0 -50%;
-  max-width: min(46vw, 620px);
+  max-width: min(55vw, 760px);
   display: flex;
   flex-direction: column;
   gap: clamp(8px, 1.6vh, 14px);
@@ -263,7 +263,7 @@
 }
 
 .teamDescription {
-  max-width: 42ch;
+  max-width: 52ch;
   font-size: clamp(14.5px, 2vh, 17px);
   line-height: 1.55;
   color: rgba(245, 239, 228, 0.78);
@@ -289,6 +289,25 @@
   display: flex;
   align-items: baseline;
   gap: 14px;
+}
+
+.factBullet {
+  align-items: center;
+  gap: clamp(11px, 1vw, 16px);
+}
+
+.factDot {
+  width: clamp(8px, 0.72vw, 11px);
+  height: clamp(8px, 0.72vw, 11px);
+  flex: 0 0 auto;
+  border-radius: 50%;
+}
+
+.factBullet .factValue {
+  min-width: 0;
+  font-size: clamp(21px, 3vh, 32px);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
 }
 
 .factValue {

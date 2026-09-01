@@ -3,7 +3,7 @@
 export interface TeamFact {
   /** PLACEHOLDER values like "XX" until real numbers are supplied. */
   value: string
-  label: string
+  label?: string
 }
 
 export interface Team {
