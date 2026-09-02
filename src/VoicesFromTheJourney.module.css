@@ -1663,34 +1663,34 @@
 
 .spot[data-effect='celestial'] .solarSun img {
   opacity: .96;
-  filter: saturate(.56) brightness(.82) contrast(1.24);
+  filter: saturate(.64) brightness(.96) contrast(1.16);
 }
 
 .spot[data-effect='celestial'] .solarSun::before {
   background:
     radial-gradient(
       ellipse 15.5% 23.5% at var(--shadow-x, 59%) var(--shadow-y, 59%),
-      rgba(3, 4, 9, .92) 0 66%,
-      rgba(3, 4, 9, .82) 81%,
-      rgba(3, 4, 9, .18) 94%,
+      rgba(3, 4, 9, .76) 0 64%,
+      rgba(3, 4, 9, .6) 80%,
+      rgba(3, 4, 9, .12) 94%,
       transparent 100%
     ),
     linear-gradient(
       90deg,
       transparent 39%,
-      rgba(3, 4, 9, .05) 42%,
-      rgba(3, 4, 9, .66) 47%,
-      rgba(3, 4, 9, .90) 56%,
-      rgba(3, 4, 9, .96) 100%
+      rgba(3, 4, 9, .03) 43%,
+      rgba(3, 4, 9, .42) 49%,
+      rgba(3, 4, 9, .68) 60%,
+      rgba(3, 4, 9, .82) 100%
     );
 }
 
 .spot[data-effect='celestial'] .solarSun::after {
   left: 39%;
   top: 31%;
-  width: 13%;
+  width: 15%;
   height: 42%;
-  opacity: .62;
+  opacity: .72;
 }
 
 .spot[data-effect='celestial'] .solarQuote p + p {
