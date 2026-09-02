@@ -737,7 +737,7 @@ export const WB_PEOPLE: WorkbookPerson[] = [
     "id": "BPT-005",
     "displayOrder": 5,
     "name": "Martin Chalev",
-    "role": "Senior Specialist",
+    "role": "Specialist",
     "team": "BPT & Testing Team",
     "isLeadership": false,
     "photoPosition": "center",
@@ -806,7 +806,7 @@ export const WB_PEOPLE: WorkbookPerson[] = [
       "activities",
       "fall outside the conventional process management scope."
     ],
-    "keyContribution": "Kami’s contribution extends beyond process optimisation into the delivery of the solutions that follow. By redesigning and rebuilding the Employee Management and Business Trip processes in Power Apps, she helped establish an internal alternative to the vendor-provided BPM solution. The result improved both processes and enabled the retirement of a legacy system with ongoing maintenance costs — turning process expertise into tangible operational and financial value.",
+    "keyContribution": "Kami’s contribution extends beyond process optimisation into the delivery of the solutions that follow. By redesigning and rebuilding the FixIT and Memo approval processes in Power Apps, she helped establish an internal alternative to the vendor-provided BPM solution. The result improved both processes and enabled the retirement of a legacy system with ongoing maintenance costs — turning process expertise into tangible operational and financial value.",
     "keyContributionEmphasis": [
       "improved both processes and enabled the retirement of a legacy system with ongoing maintenance costs — turning process expertise into tangible operational and financial value."
     ],
@@ -904,7 +904,7 @@ export const WB_PEOPLE: WorkbookPerson[] = [
     "id": "BPT-007",
     "displayOrder": 7,
     "name": "Stoil Mortev",
-    "role": "Specialist",
+    "role": "Senior Specialist",
     "team": "BPT & Testing Team",
     "isLeadership": false,
     "photoPosition": "center",

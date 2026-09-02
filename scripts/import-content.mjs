@@ -263,6 +263,41 @@ const teams = ordered(
   }
 })
 
+const PEOPLE_TEXT_FIXES = {
+  martinRole: 'Specialist',
+  stoilRole: 'Senior Specialist',
+  kameliyaOldProcessNames: 'Employee Management and Business Trip processes',
+  kameliyaNewProcessNames: 'FixIT and Memo approval processes',
+}
+
+function applyConfirmedPersonFixes(person) {
+  if (person.id === 'BPT-005' && person.role !== PEOPLE_TEXT_FIXES.martinRole) {
+    corrections.push(`${person.name}: ${person.role} → ${PEOPLE_TEXT_FIXES.martinRole}`)
+    return { ...person, role: PEOPLE_TEXT_FIXES.martinRole }
+  }
+
+  if (person.id === 'BPT-007' && person.role !== PEOPLE_TEXT_FIXES.stoilRole) {
+    corrections.push(`${person.name}: ${person.role} → ${PEOPLE_TEXT_FIXES.stoilRole}`)
+    return { ...person, role: PEOPLE_TEXT_FIXES.stoilRole }
+  }
+
+  if (
+    person.id === 'PROC-006' &&
+    person.keyContribution?.includes(PEOPLE_TEXT_FIXES.kameliyaOldProcessNames)
+  ) {
+    corrections.push(`${person.name}: updated process names in key contribution`)
+    return {
+      ...person,
+      keyContribution: person.keyContribution.replace(
+        PEOPLE_TEXT_FIXES.kameliyaOldProcessNames,
+        PEOPLE_TEXT_FIXES.kameliyaNewProcessNames,
+      ),
+    }
+  }
+
+  return person
+}
+
 const people = ordered(
   readSheet(wb, '05_People', 'id', (id) => /^(PM|PROC|BPT)-\d+$/.test(id)),
 ).map((r) => ({
@@ -285,7 +320,7 @@ const people = ordered(
   personalFact: content(r.get('personal_fact') || r.get('A_Closer_look')),
   personalFactEmphasis: emphasis(r, r.get('personal_fact') ? 'personal_fact' : 'A_Closer_look'),
   accent: content(r.get('accent')),
-}))
+})).map(applyConfirmedPersonFixes)
 
 const timeline = ordered(
   readSheet(wb, '06_Timeline', 'milestone_id', (id) => /^M-\d{4}$/.test(id)),
