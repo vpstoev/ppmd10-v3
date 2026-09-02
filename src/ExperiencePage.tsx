@@ -6,6 +6,7 @@ import CurrentFocus from './CurrentFocus.tsx'
 import VoicesFromTheJourney from './VoicesFromTheJourney.tsx'
 import FinalClosing from './FinalClosing.tsx'
 import SectionNavigation from './SectionNavigation.tsx'
+import MusicToggle from './MusicToggle.tsx'
 import { siteConfig } from './siteConfig.ts'
 
 /**
@@ -19,6 +20,7 @@ import { siteConfig } from './siteConfig.ts'
 export default function ExperiencePage() {
   return (
     <>
+      <MusicToggle />
       <ExperienceSection />
       <div id="ppmd-timeline">
         <TenYearsInMotion />
